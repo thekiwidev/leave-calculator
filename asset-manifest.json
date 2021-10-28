@@ -1,0 +1,24 @@
+{
+  "files": {
+    "main.css": "/thekiwidev.github.io/leave-calculator/static/css/main.043eef2b.chunk.css",
+    "main.js": "/thekiwidev.github.io/leave-calculator/static/js/main.d730d7fd.chunk.js",
+    "main.js.map": "/thekiwidev.github.io/leave-calculator/static/js/main.d730d7fd.chunk.js.map",
+    "runtime-main.js": "/thekiwidev.github.io/leave-calculator/static/js/runtime-main.d422cbd3.js",
+    "runtime-main.js.map": "/thekiwidev.github.io/leave-calculator/static/js/runtime-main.d422cbd3.js.map",
+    "static/js/2.a025c45f.chunk.js": "/thekiwidev.github.io/leave-calculator/static/js/2.a025c45f.chunk.js",
+    "static/js/2.a025c45f.chunk.js.map": "/thekiwidev.github.io/leave-calculator/static/js/2.a025c45f.chunk.js.map",
+    "static/js/3.ce53cff1.chunk.js": "/thekiwidev.github.io/leave-calculator/static/js/3.ce53cff1.chunk.js",
+    "static/js/3.ce53cff1.chunk.js.map": "/thekiwidev.github.io/leave-calculator/static/js/3.ce53cff1.chunk.js.map",
+    "index.html": "/thekiwidev.github.io/leave-calculator/index.html",
+    "service-worker.js": "/thekiwidev.github.io/leave-calculator/service-worker.js",
+    "service-worker.js.map": "/thekiwidev.github.io/leave-calculator/service-worker.js.map",
+    "static/css/main.043eef2b.chunk.css.map": "/thekiwidev.github.io/leave-calculator/static/css/main.043eef2b.chunk.css.map",
+    "static/js/2.a025c45f.chunk.js.LICENSE.txt": "/thekiwidev.github.io/leave-calculator/static/js/2.a025c45f.chunk.js.LICENSE.txt"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.d422cbd3.js",
+    "static/js/2.a025c45f.chunk.js",
+    "static/css/main.043eef2b.chunk.css",
+    "static/js/main.d730d7fd.chunk.js"
+  ]
+}
