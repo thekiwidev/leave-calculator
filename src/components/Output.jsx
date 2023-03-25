@@ -12,7 +12,7 @@ const Output = () => {
           <code> {expirationDate}</code>
         </b>
       </p>
-      <p className="text-4xl font-bold mb-1">{`${resumptionDate.date} ${resumptionDate.day},`}</p>
+      <p className="text-3xl font-bold mb-1">{`${resumptionDate.date} ${resumptionDate.day},`}</p>
       <p className="text-2xl font-bold">{`${resumptionDate.month}, ${resumptionDate.year}.`}</p>
     </div>
   );
