@@ -33,15 +33,13 @@ const ContextProvider = ({ children }) => {
   };
 
   // * Update the leave entitlement with the date picker
-  // ! LEAVE ENTITLEMENTS
+  // ! LEAVE START DATE
   const updateStartDate = (value) => {
     setStartDate(format(parseISO(value), `yyyy-MM-dd`));
   };
 
-  const formatDate = (date) => {
-    return format(date, `do MMMM, yyyy`);
-  };
-
+  // * calculate the leave based on the start date and the leave entitlement
+  // ! CALCULATE LEAVE
   const calculate = (date, amount) => {
     let commencementDate = sub(parseISO(date), { days: 1 });
 
@@ -59,6 +57,8 @@ const ContextProvider = ({ children }) => {
     });
   };
 
+  // * calculate the leave on load and changed value of the start date and the leave entitlement
+  // ! USE-EFFECT
   useEffect(() => {
     // console.log(new Date(expirationDate));
     calculate(startDate, leaveEntitlement);
@@ -69,7 +69,6 @@ const ContextProvider = ({ children }) => {
       value={{
         calculate,
         expirationDate,
-        formatDate,
         leaveEntitlement,
         resumptionDate,
         startDate,
