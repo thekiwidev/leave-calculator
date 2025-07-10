@@ -57,6 +57,7 @@ export function NotPublicHolidayManager() {
   const [newName, setNewName] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const [showAddForm, setShowAddForm] = useState(false); // @comment: Controls visibility of add form
   const [isAddingDate, setIsAddingDate] = useState(false); // Loading state for add operation
   const [selectedDates, setSelectedDates] = useState<Set<string>>(new Set());
 
@@ -70,9 +71,11 @@ export function NotPublicHolidayManager() {
           date: format(newDate, "yyyy-MM-dd"),
         });
 
+        // Reset form
         setNewDate(undefined);
         setNewName("");
         setIsOpen(false);
+        setShowAddForm(false); // @comment: Hide form after successful add
       } catch (error) {
         // Error is already handled in the store and shown in notPublicHolidayError
         console.error("Failed to add not public holiday:", error);
@@ -158,7 +161,19 @@ export function NotPublicHolidayManager() {
         </CollapsibleTrigger>
 
         <CollapsibleContent>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6">
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button
+                onClick={() => setShowAddForm(!showAddForm)}
+                variant="default"
+                size="sm"
+              >
+                <Plus className="w-4 h-4 mr-1" />
+                Add Date
+              </Button>
+            </div>
+
             {/* Error Display */}
             {notPublicHolidayError && (
               <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
@@ -177,185 +192,221 @@ export function NotPublicHolidayManager() {
             )}
 
             {/* Add new date form */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div className="space-y-2">
-                <Label htmlFor="not-holiday-name">Name</Label>
-                <Input
-                  id="not-holiday-name"
-                  value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
-                  placeholder="e.g., Work Day"
-                  className="w-full"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Date</Label>
-                <Popover open={isOpen} onOpenChange={setIsOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !newDate && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {newDate ? format(newDate, "PPP") : "Pick a date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <CalendarComponent
-                      mode="single"
-                      selected={newDate}
-                      onSelect={setNewDate}
-                      initialFocus
-                      captionLayout="dropdown"
-                      fromYear={2020}
-                      toYear={2030}
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
-              <div className="space-y-2">
-                <Label className="text-transparent">Action</Label>
-                <Button
-                  onClick={handleAddDate}
-                  disabled={!newDate || !newName.trim() || isAddingDate}
-                  className="w-full"
-                >
-                  {isAddingDate ? (
-                    <>
-                      <Loader className="h-4 w-4 mr-2 animate-spin" />
-                      Adding...
-                    </>
-                  ) : (
-                    <>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Date
-                    </>
-                  )}
-                </Button>
-              </div>
-            </div>
-
-            {/* Batch operations */}
-            {notPublicHolidayDates.length > 0 && (
-              <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="select-all"
-                    checked={isAllSelected}
-                    onCheckedChange={handleSelectAll}
-                  />
-                  <Label htmlFor="select-all" className="text-sm">
-                    Select all ({notPublicHolidayDates.length})
-                  </Label>
-                </div>
-                {isSomeSelected && (
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button variant="destructive" size="sm">
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete Selected ({selectedDates.size})
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          Delete Selected Dates
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>
-                          Are you sure you want to delete {selectedDates.size}{" "}
-                          selected date(s)? This action cannot be undone.
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleBatchDelete}>
-                          Delete
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                )}
-              </div>
-            )}
-
-            {/* List of excluded dates */}
-            {notPublicHolidayDates.length > 0 && (
-              <div className="space-y-2">
-                <Label>Excluded Dates ({notPublicHolidayDates.length})</Label>
-                <div className="space-y-2 max-h-48 overflow-y-auto">
-                  {notPublicHolidayDates.map((dateItem, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-3 bg-muted rounded-lg"
-                    >
-                      <div className="flex items-center space-x-3">
-                        <Checkbox
-                          id={`date-${index}`}
-                          checked={selectedDates.has(dateItem.date)}
-                          onCheckedChange={(checked) =>
-                            handleSelectDate(dateItem.date, checked as boolean)
-                          }
-                        />
-                        <div className="flex-1">
-                          <div className="font-medium">{dateItem.name}</div>
-                          <div className="text-sm text-muted-foreground">
-                            {formatDateWithDay(dateItem.date)}
-                          </div>
-                        </div>
-                      </div>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="outline" size="sm" className="ml-2">
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Delete Date</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Are you sure you want to delete "{dateItem.name}"
-                              from excluded dates? This action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={async () => {
-                                try {
-                                  await handleRemoveDate(dateItem.date);
-                                } catch (error) {
-                                  // Error is already handled in the store
-                                  console.error(
-                                    "Failed to delete not public holiday:",
-                                    error
-                                  );
-                                }
-                              }}
-                            >
-                              Delete
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+            {showAddForm && (
+              <Card className="bg-muted/50">
+                <CardHeader>
+                  <CardTitle className="text-base">
+                    Add New Not Public Holiday Date
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="not-holiday-name">Name</Label>
+                      <Input
+                        id="not-holiday-name"
+                        value={newName}
+                        onChange={(e) => setNewName(e.target.value)}
+                        placeholder="e.g., Work Day"
+                      />
                     </div>
-                  ))}
-                </div>
-              </div>
+                    <div className="space-y-2">
+                      <Label>Date</Label>
+                      <Popover open={isOpen} onOpenChange={setIsOpen}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className={cn(
+                              "w-full justify-start text-left font-normal",
+                              !newDate && "text-muted-foreground"
+                            )}
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {newDate ? format(newDate, "PPP") : "Pick a date"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <CalendarComponent
+                            mode="single"
+                            selected={newDate}
+                            onSelect={setNewDate}
+                            initialFocus
+                            captionLayout="dropdown"
+                            fromYear={2020}
+                            toYear={2030}
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      onClick={() => setShowAddForm(false)}
+                      variant="ghost"
+                      size="sm"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleAddDate}
+                      disabled={!newDate || !newName.trim() || isAddingDate}
+                      size="sm"
+                    >
+                      {isAddingDate ? (
+                        <>
+                          <Loader className="h-4 w-4 mr-1 animate-spin" />
+                          Adding...
+                        </>
+                      ) : (
+                        "Add"
+                      )}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
             )}
 
-            {notPublicHolidayDates.length === 0 &&
-              !isLoadingNotPublicHolidays && (
-                <div className="text-center py-8 text-muted-foreground">
-                  <Calendar className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                  <p>No excluded dates added yet</p>
-                  <p className="text-sm">
-                    Add dates that should not be treated as public holidays
-                  </p>
-                </div>
-              )}
+            {/* Excluded Dates List */}
+            <Card>
+              <CardContent className="p-0">
+                {notPublicHolidayDates.length === 0 ? (
+                  <div className="p-6 text-center">
+                    <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                    <h4 className="text-lg font-medium mb-2">
+                      No Excluded Dates
+                    </h4>
+                    <p className="text-muted-foreground">
+                      Add dates that should not be treated as public holidays.
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    {/* Batch operations */}
+                    {notPublicHolidayDates.length > 0 && (
+                      <div className="flex items-center justify-between p-4 bg-muted border-b">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="select-all"
+                            checked={isAllSelected}
+                            onCheckedChange={handleSelectAll}
+                          />
+                          <Label htmlFor="select-all" className="text-sm">
+                            Select all ({notPublicHolidayDates.length})
+                          </Label>
+                        </div>
+                        {isSomeSelected && (
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="destructive" size="sm">
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Delete Selected ({selectedDates.size})
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                  Delete Selected Dates
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to delete{" "}
+                                  {selectedDates.size} selected date(s)? This
+                                  action cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleBatchDelete}>
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        )}
+                      </div>
+                    )}
+
+                    <div className="divide-y">
+                      {notPublicHolidayDates.map((dateItem, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <Checkbox
+                              id={`date-${index}`}
+                              checked={selectedDates.has(dateItem.date)}
+                              onCheckedChange={(checked) =>
+                                handleSelectDate(
+                                  dateItem.date,
+                                  checked as boolean
+                                )
+                              }
+                            />
+                            <div className="flex-shrink-0">
+                              <div className="w-2 h-2 bg-primary rounded-full"></div>
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <h5 className="text-sm font-medium">
+                                  {dateItem.name}
+                                </h5>
+                                <Badge variant="secondary" className="text-xs">
+                                  Manual
+                                </Badge>
+                              </div>
+                              <p className="text-xs text-muted-foreground">
+                                {formatDateWithDay(dateItem.date)}
+                              </p>
+                            </div>
+                          </div>
+
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Delete Date</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to delete "
+                                  {dateItem.name}" (
+                                  {formatDateWithDay(dateItem.date)})? This
+                                  action cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={async () => {
+                                    try {
+                                      await handleRemoveDate(dateItem.date);
+                                    } catch (error) {
+                                      // Error is already handled in the store
+                                      console.error(
+                                        "Failed to delete not public holiday:",
+                                        error
+                                      );
+                                    }
+                                  }}
+                                >
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
 
             {/* Loading State */}
             {isLoadingNotPublicHolidays && (

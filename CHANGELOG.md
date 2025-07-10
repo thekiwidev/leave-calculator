@@ -5,6 +5,20 @@ All notable changes to the Advanced Leave Calculator project will be documented 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1] - NotPublicHolidayManager UI Consistency Update
+
+- **Enhanced** NotPublicHolidayManager to match PublicHolidayManager's look and feel
+- **Added** hidden add form by default with dedicated "Add Date" button to toggle visibility
+- **Improved** form layout from 3-column to 2-column grid matching PublicHolidayManager style
+- **Added** Cancel button functionality to hide form without saving changes
+- **Enhanced** list items with consistent styling including hover effects and visual indicators
+- **Added** proper Card wrapper for excluded dates list with improved spacing and structure
+- **Improved** batch operations layout with consistent border separation and styling
+- **Enhanced** empty state styling to match PublicHolidayManager's professional appearance
+- **Added** "Manual" badge to all excluded dates for visual consistency
+- **Improved** responsive design with proper mobile-friendly layouts
+- **Enhanced** user experience with consistent interaction patterns across both holiday managers
+
 ## [2.0.0] - Supabase Database Integration for Universal Storage
 
 - **Added** Supabase integration as universal storage system for public holidays
