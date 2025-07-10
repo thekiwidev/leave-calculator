@@ -5,6 +5,19 @@ All notable changes to the Advanced Leave Calculator project will be documented 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - Shadcn/UI Integration and Enhanced UX
+
+- **Added** Shadcn/UI component library for modern, accessible design system
+- **Enhanced** all form components with improved styling and user experience
+- **Added** DatePicker component with calendar UI for better date selection
+- **Improved** color scheme: red for expiration dates, green for total days calculated
+- **Enhanced** public holidays section now collapsed by default for better space usage
+- **Added** Card, Button, Input, Select, Badge, and Collapsible components from Shadcn/UI
+- **Improved** visual hierarchy with better typography and spacing
+- **Enhanced** responsive design with grid layouts and improved mobile experience
+- **Added** modern gradient header with improved visual appeal
+- **Fixed** delete confirmation showing both icon and "Confirm" text for clarity
+
 ## [1.1.0] - Weekend Holiday Handling and UI Improvements
 
 - **Added** automatic shifting of weekend public holidays to next working day

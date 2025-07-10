@@ -18,16 +18,14 @@ function App() {
   }, [initializeStore]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       <Header />
 
       <main className="flex-1 container mx-auto px-4 py-8 max-w-4xl">
         <div className="space-y-8">
           {/* Leave Calculator Section */}
-          <section className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              Calculate Your Leave
-            </h2>
+          <section>
+            <h2 className="text-2xl font-bold mb-6">Calculate Your Leave</h2>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <LeaveCalculatorForm />
               <LeaveResults />
@@ -35,10 +33,8 @@ function App() {
           </section>
 
           {/* Public Holiday Management Section */}
-          <section className="bg-white rounded-lg shadow-md p-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              Manage Public Holidays
-            </h2>
+          <section>
+            <h2 className="text-2xl font-bold mb-6">Manage Public Holidays</h2>
             <PublicHolidayManager />
           </section>
         </div>

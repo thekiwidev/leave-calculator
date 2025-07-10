@@ -1,19 +1,19 @@
 //@component: Header component for the application
-import { Calendar } from "lucide-react";
+import { Calculator } from "lucide-react";
 
 export function Header() {
   return (
-    <header className="bg-white shadow-sm border-b">
-      <div className="container mx-auto px-4 py-4 max-w-4xl">
+    <header className="bg-gradient-to-r from-zinc-900 to-black shadow-lg">
+      <div className="container mx-auto px-4 py-6 max-w-4xl">
         <div className="flex items-center space-x-3">
-          <div className="flex items-center justify-center w-10 h-10 bg-blue-600 rounded-lg">
-            <Calendar className="w-6 h-6 text-white" />
+          <div className="bg-white/10 p-2 rounded-lg">
+            <Calculator className="w-8 h-8 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-white">
               Advanced Leave Calculator
             </h1>
-            <p className="text-sm text-gray-600">
+            <p className="text-blue-100 text-sm">
               Calculate working days, excluding weekends and public holidays
             </p>
           </div>

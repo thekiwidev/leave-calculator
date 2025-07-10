@@ -1,11 +1,11 @@
 //@utils: Date utility functions using date-fns
-import { 
-  addDays, 
-  isWeekend, 
-  parseISO, 
-  format, 
+import {
+  addDays,
+  isWeekend,
+  parseISO,
+  format,
   startOfDay,
-  getDay 
+  getDay,
 } from "date-fns";
 import type { PublicHoliday } from "@/types";
 
@@ -14,36 +14,40 @@ import type { PublicHoliday } from "@/types";
  * @param publicHolidays - Array of public holidays
  * @returns Processed array with weekend holidays shifted to working days
  */
-export const processPublicHolidays = (publicHolidays: PublicHoliday[]): PublicHoliday[] => {
+export const processPublicHolidays = (
+  publicHolidays: PublicHoliday[]
+): PublicHoliday[] => {
   const processedHolidays: PublicHoliday[] = [];
-  
+
   for (const holiday of publicHolidays) {
     const holidayDate = parseISO(holiday.date);
     const dayOfWeek = getDay(holidayDate); // 0 = Sunday, 6 = Saturday
-    
-    if (dayOfWeek === 0 || dayOfWeek === 6) { // Weekend
+
+    if (dayOfWeek === 0 || dayOfWeek === 6) {
+      // Weekend
       // Find the next Monday (working day)
       let nextWorkingDay = holidayDate;
       do {
         nextWorkingDay = addDays(nextWorkingDay, 1);
       } while (isWeekend(nextWorkingDay));
-      
+
       processedHolidays.push({
         ...holiday,
-        date: format(nextWorkingDay, 'yyyy-MM-dd'),
-        name: `${holiday.name} (observed)` // Mark as observed
+        date: format(nextWorkingDay, "yyyy-MM-dd"),
+        name: `${holiday.name} (observed)`, // Mark as observed
       });
     } else {
       // Keep the original holiday
       processedHolidays.push(holiday);
     }
   }
-  
+
   // Remove duplicates that might occur when multiple holidays shift to the same day
-  const uniqueHolidays = processedHolidays.filter((holiday, index, self) => 
-    index === self.findIndex(h => h.date === holiday.date)
+  const uniqueHolidays = processedHolidays.filter(
+    (holiday, index, self) =>
+      index === self.findIndex((h) => h.date === holiday.date)
   );
-  
+
   return uniqueHolidays.sort((a, b) => a.date.localeCompare(b.date));
 };
 
