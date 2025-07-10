@@ -17,7 +17,7 @@ interface DatePickerProps {
   placeholder?: string;
   disabled?: boolean;
   className?: string;
-  minDate?: Date;
+  disableWeekends?: boolean;
 }
 
 export function DatePicker({
@@ -26,9 +26,27 @@ export function DatePicker({
   placeholder = "Pick a date",
   disabled = false,
   className,
-  minDate,
+  disableWeekends = false,
 }: DatePickerProps) {
   const [isOpen, setIsOpen] = React.useState(false);
+
+  // @helper: Handle date selection with proper timezone handling
+  const handleDateSelect = (date: Date | undefined) => {
+    if (date) {
+      // Create a new date at local noon to avoid timezone issues
+      const localDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0);
+      onChange?.(localDate);
+    } else {
+      onChange?.(undefined);
+    }
+    setIsOpen(false);
+  };
+
+  // @helper: Check if date is weekend (Saturday = 6, Sunday = 0)
+  const isWeekend = (date: Date) => {
+    const day = date.getDay();
+    return day === 0 || day === 6;
+  };
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -36,7 +54,7 @@ export function DatePicker({
         <Button
           variant="outline"
           className={cn(
-            "w-full justify-start text-left font-normal",
+            "w-full justify-start text-left font-normal border-2",
             !value && "text-muted-foreground",
             className
           )}
@@ -50,13 +68,10 @@ export function DatePicker({
         <Calendar
           mode="single"
           selected={value}
-          onSelect={(date) => {
-            onChange?.(date);
-            setIsOpen(false);
-          }}
+          onSelect={handleDateSelect}
           disabled={(date) => {
-            if (minDate) {
-              return date < minDate;
+            if (disableWeekends) {
+              return isWeekend(date);
             }
             return false;
           }}

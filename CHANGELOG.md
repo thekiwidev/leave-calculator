@@ -5,6 +5,16 @@ All notable changes to the Advanced Leave Calculator project will be documented 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - Calendar and UX Refinements
+
+- **Fixed** calendar date selection timezone issue - now correctly selects the intended date
+- **Improved** responsive grid layout for result cards - better width-aware display on large screens
+- **Enhanced** start date input with blue color highlighting for better visibility
+- **Simplified** date picker to only disable weekends, allowing current and past dates for flexibility
+- **Removed** unnecessary pulsing dot indicator from start date input
+- **Streamlined** results display by removing redundant start date card
+- **Improved** calendar component with proper timezone handling to prevent off-by-one date selection
+
 ## [1.2.0] - Shadcn/UI Integration and Enhanced UX
 
 - **Added** Shadcn/UI component library for modern, accessible design system

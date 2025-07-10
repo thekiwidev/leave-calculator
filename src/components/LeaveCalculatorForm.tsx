@@ -155,18 +155,21 @@ export function LeaveCalculatorForm() {
 
         {/* Start Date */}
         <div className="space-y-2">
-          <Label htmlFor="start-date">Start Date</Label>
+          <Label htmlFor="start-date" className="text-blue-700 font-medium">
+            Start Date
+          </Label>
           <DatePicker
             value={
-              leaveInput.startDate ? new Date(leaveInput.startDate) : undefined
+              leaveInput.startDate ? new Date(leaveInput.startDate + "T12:00:00") : undefined
             }
             onChange={(date: Date | undefined) =>
               setLeaveInput({
                 startDate: date ? date.toISOString().split("T")[0] : "",
               })
             }
-            minDate={new Date()}
             placeholder="Select start date"
+            className="border-blue-300 focus:border-blue-500 focus:ring-blue-500"
+            disableWeekends={true}
           />
         </div>
 

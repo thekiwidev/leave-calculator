@@ -179,7 +179,7 @@ export function PublicHolidayManager() {
                       <DatePicker
                         value={
                           newHoliday.date
-                            ? new Date(newHoliday.date)
+                            ? new Date(newHoliday.date + "T12:00:00")
                             : undefined
                         }
                         onChange={(date: Date | undefined) =>
@@ -188,7 +188,6 @@ export function PublicHolidayManager() {
                             date: date ? date.toISOString().split("T")[0] : "",
                           })
                         }
-                        minDate={new Date()}
                         placeholder="Select holiday date"
                       />
                     </div>

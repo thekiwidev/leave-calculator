@@ -30,7 +30,7 @@ export function LeaveResults() {
       <h3 className="text-lg font-semibold mb-4">Leave Calculation Results</h3>
 
       {/* Key Dates */}
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3">{/* Make it width-aware for better responsiveness */}
         <Card className="border-red-200 bg-red-50 p-0">
           <CardContent className="p-4">
             <div className="flex items-center space-x-3">
