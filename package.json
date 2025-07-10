@@ -1,7 +1,7 @@
 {
   "name": "advanced-leave-calculator",
   "private": true,
-  "version": "1.4.2",
+  "version": "1.4.3",
   "type": "module",
   "description": "Advanced Leave Calculator - Calculate employee leave with working days and public holidays",
   "keywords": [

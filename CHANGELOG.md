@@ -5,6 +5,32 @@ All notable changes to the Advanced Leave Calculator project will be documented 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.3] - Dynamic Greeting Header with Real-Time Clock
+
+- **Replaced** dark gradient header with clean, light design featuring dynamic greeting
+- **Added** real-time date and time display that updates every second
+- **Enhanced** header with contextual greetings based on time of day (Good Morning/Afternoon/Evening)
+- **Improved** visual design with light background, blue accent colors, and better spacing
+- **Added** separate date and time sections with Calendar and Clock icons for better readability
+- **Enhanced** header layout with greeting on left side and date/time on right side
+- **Updated** header styling to be more welcoming and informative for daily use
+- **Fixed** mobile layout with stacked date/time for better readability on small screens
+- **Enhanced** calendar icon with gray background and black icon for better contrast
+- **Added** interactive calendar modal that opens when tapping the calendar icon
+- **Improved** responsive design with different layouts for desktop and mobile views
+- **Added** full calendar view with proper styling and close functionality
+- **Enhanced** calendar modal to use shadcn/ui Calendar component for better design consistency
+- **Added** dual-month calendar view showing current and next month for better navigation
+- **Improved** calendar modal width and spacing for better user experience
+- **Updated** calendar to single-month view with year/month dropdown navigation (2020-2030 range)
+- **Enhanced** modal background opacity to 75% for better focus and visual separation
+- **Fixed** calendar centering within modal for proper visual balance
+- **Repositioned** navigation chevrons to sides of month/year dropdowns matching start date picker layout
+- **Improved** calendar navigation layout with proper spacing and positioning
+- **Added** refresh button in footer to clear cache and pull fresh data while preserving localStorage
+- **Enhanced** app refresh functionality that clears service worker caches but maintains user data
+- **Improved** user experience with easy access to refresh app for updates without losing holidays
+
 ## [1.4.2] - PWA Functionality and UI Fixes
 
 - **Fixed** PWA detection in Chrome by adding proper manifest link to index.html
