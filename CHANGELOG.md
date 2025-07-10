@@ -5,6 +5,21 @@ All notable changes to the Advanced Leave Calculator project will be documented 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.3] - Result View Responsiveness Fix
+
+- **Fixed** empty result placeholder now shows properly on desktop
+- **Enhanced** responsive behavior by hiding empty result view only on mobile devices
+- **Added** proper responsive breakpoints for result view visibility
+- **Improved** empty state UX with desktop-only placeholder message
+
+## [2.0.2] - UI Visibility Improvements
+
+- **Enhanced** mobile experience by hiding results view when no calculation is available
+- **Improved** UI clarity by hiding public holidays section when no holidays are skipped
+- **Removed** empty state placeholder to reduce visual clutter on mobile devices
+- **Optimized** screen space usage with conditional rendering of result sections
+- **Enhanced** user experience by only showing relevant information when needed
+
 ## [2.0.1] - NotPublicHolidayManager UI Consistency Update
 
 - **Enhanced** NotPublicHolidayManager to match PublicHolidayManager's look and feel

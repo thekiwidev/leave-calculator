@@ -12,16 +12,20 @@ export function LeaveResults() {
 
   if (!leaveResult) {
     return (
-      <Card>
-        <CardContent className="flex flex-col items-center justify-center p-6 text-center">
-          <Calendar className="w-12 h-12 text-muted-foreground mb-3" />
-          <CardTitle className="mb-2">No Calculation Yet</CardTitle>
-          <p className="text-muted-foreground">
-            Fill in the leave details and click "Calculate Leave" to see your
-            results.
-          </p>
-        </CardContent>
-      </Card>
+      <div className="hidden md:block">
+        {" "}
+        {/* Hide on mobile, show on desktop */}
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center p-6 text-center">
+            <Calendar className="w-12 h-12 text-muted-foreground mb-3" />
+            <CardTitle className="mb-2">No Calculation Yet</CardTitle>
+            <p className="text-muted-foreground">
+              Fill in the leave details and click "Calculate Leave" to see your
+              results.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
@@ -94,18 +98,18 @@ export function LeaveResults() {
         </Card>
       </div>
 
-      {/* Skipped Public Holidays */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">
-            Public Holidays During Leave{" "}
-            <Badge variant="secondary" className="ml-2">
-              {leaveResult.skippedHolidays.length}
-            </Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {leaveResult.skippedHolidays.length > 0 ? (
+      {/* Skipped Public Holidays - Only show if there are holidays */}
+      {leaveResult.skippedHolidays.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">
+              Public Holidays During Leave{" "}
+              <Badge variant="secondary" className="ml-2">
+                {leaveResult.skippedHolidays.length}
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
             <div className="space-y-2">
               {leaveResult.skippedHolidays.map((holiday, index) => (
                 <div
@@ -119,13 +123,9 @@ export function LeaveResults() {
                 </div>
               ))}
             </div>
-          ) : (
-            <p className="text-muted-foreground">
-              No public holidays fall within your leave period.
-            </p>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Resumption Date Adjustment Details */}
       {leaveResult.resumptionAdjustment &&
