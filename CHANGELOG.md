@@ -5,6 +5,46 @@ All notable changes to the Advanced Leave Calculator project will be documented 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1] - NotPublicHolidayManager UI Consistency Update
+
+- **Enhanced** NotPublicHolidayManager to match PublicHolidayManager's look and feel
+- **Added** hidden add form by default with dedicated "Add Date" button to toggle visibility
+- **Improved** form layout from 3-column to 2-column grid matching PublicHolidayManager style
+- **Added** Cancel button functionality to hide form without saving changes
+- **Enhanced** list items with consistent styling including hover effects and visual indicators
+- **Added** proper Card wrapper for excluded dates list with improved spacing and structure
+- **Improved** batch operations layout with consistent border separation and styling
+- **Enhanced** empty state styling to match PublicHolidayManager's professional appearance
+- **Added** "Manual" badge to all excluded dates for visual consistency
+- **Improved** responsive design with proper mobile-friendly layouts
+- **Enhanced** user experience with consistent interaction patterns across both holiday managers
+
+## [2.0.0] - Supabase Database Integration for Universal Storage
+
+- **Added** Supabase integration as universal storage system for public holidays
+- **Replaced** localStorage with Supabase PostgreSQL database for persistent holiday storage
+- **Added** real-time synchronization across all app instances using Supabase subscriptions
+- **Implemented** automatic API holiday sync to database with duplicate prevention
+- **Added** comprehensive error handling for all database operations
+- **Enhanced** holiday management with instant updates across all connected clients
+- **Added** robust offline fallback that gracefully handles network issues
+- **Created** dedicated Supabase service layer for clean database interactions
+- **Implemented** async/await pattern for all holiday CRUD operations
+- **Added** automatic cleanup of real-time subscriptions on app unmount
+- **Enhanced** store architecture to handle both API syncing and manual holiday management
+- **Maintained** backward compatibility with existing local preferences storage
+- **Added** detailed logging for database operations and error tracking
+- **Improved** user experience with proper loading states during database operations
+- **Enhanced** Add Holiday button with loading state showing spinner and "Adding..." text during save operation
+- **Added** button disable state during add operation to prevent double submissions
+- **Extended** Supabase integration to "Not Public Holidays" with dedicated `not_public_holidays` table
+- **Added** real-time synchronization for excluded holiday dates across all app instances
+- **Enhanced** NotPublicHolidayManager with Supabase storage and loading states
+- **Implemented** async operations for adding, removing, and batch deleting excluded dates
+- **Added** comprehensive error handling and user feedback for excluded dates management
+- **Replaced** localStorage with Supabase for excluded dates persistence and real-time updates
+- **Fixed** unused import warning by removing unnecessary `fetchNotPublicHolidaysFromSupabase` import from store
+
 ## [1.4.3] - Dynamic Greeting Header with Real-Time Clock
 
 - **Replaced** dark gradient header with clean, light design featuring dynamic greeting
