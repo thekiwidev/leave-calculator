@@ -61,16 +61,17 @@ export function LeaveResults() {
                 <p className="text-base font-semibold text-blue-900">
                   {formatDateWithDay(leaveResult.resumptionDate)}
                 </p>
-                {leaveResult.resumptionAdjustment && 
-                 leaveResult.resumptionAdjustment.adjustedHolidays.length > 0 && (
-                  <p className="text-xs text-blue-700 mt-1">
-                    Adjusted from{" "}
-                    {formatDateWithDay(
-                      leaveResult.resumptionAdjustment.originalDate
-                    )}{" "}
-                    due to {leaveResult.resumptionAdjustment.reason}
-                  </p>
-                )}
+                {leaveResult.resumptionAdjustment &&
+                  leaveResult.resumptionAdjustment.adjustedHolidays.length >
+                    0 && (
+                    <p className="text-xs text-blue-700 mt-1">
+                      Adjusted from{" "}
+                      {formatDateWithDay(
+                        leaveResult.resumptionAdjustment.originalDate
+                      )}{" "}
+                      due to {leaveResult.resumptionAdjustment.reason}
+                    </p>
+                  )}
               </div>
             </div>
           </CardContent>
