@@ -68,7 +68,7 @@ export function Footer() {
             </button>
           </div>
           <p className="text-xs text-muted-foreground/70 pt-2">
-            React • TypeScript • Tailwind CSS • PWA
+            React • TypeScript • Tailwind CSS • PWA • Supabase • Vite
           </p>
         </div>
       </div>
