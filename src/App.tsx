@@ -7,6 +7,7 @@ import { PublicHolidayManager } from "@/components/PublicHolidayManager";
 import { NotPublicHolidayManager } from "@/components/NotPublicHolidayManager";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { PWAInstallBanner } from "@/components/PWAInstallBanner";
 
 function App() {
   const initializeStore = useLeaveCalculatorStore(
@@ -49,6 +50,9 @@ function App() {
       </main>
 
       <Footer />
+
+      {/* PWA Install Banner */}
+      <PWAInstallBanner />
     </div>
   );
 }

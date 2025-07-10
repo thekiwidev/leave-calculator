@@ -10,11 +10,10 @@ export function Header() {
             <Calculator className="w-8 h-8 text-white" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-white">
-              Advanced Leave Calculator
-            </h1>
+            <h1 className="text-2xl font-bold text-white">Leave Calculator</h1>
             <p className="text-blue-100 text-sm">
-              Calculate working days, excluding weekends and public holidays
+              Made by Adedotun for OSGF Leave Matters Unit - Making leave
+              drafting easier
             </p>
           </div>
         </div>

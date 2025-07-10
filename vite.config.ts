@@ -12,22 +12,68 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       workbox: {
-        globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
+        globPatterns: ["**/*.{js,css,html,ico,png,svg,woff,woff2,ttf}"],
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/api\.api-ninjas\.com\/.*/i,
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "api-cache",
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 60 * 24, // 24 hours
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+        ],
       },
+      includeAssets: ["vite.svg", "apple-touch-icon.png", "masked-icon.svg"],
       manifest: {
-        name: "Advanced Leave Calculator",
-        short_name: "Leave Calc",
+        name: "Leave Calculator - OSGF Leave Matters Unit",
+        short_name: "Leave Calculator",
         description:
-          "Calculate employee leave with working days and public holidays",
-        theme_color: "#ffffff",
+          "Advanced Leave Calculator made by Adedotun for the Leave Matters Unit in OSGF, to make the leave drafting process easier. Calculate employee leave with working days and public holidays for Nigeria.",
+        theme_color: "#18181b",
         background_color: "#ffffff",
         display: "standalone",
+        scope: "/",
         start_url: "/",
+        orientation: "portrait-primary",
+        categories: ["productivity", "business", "utilities"],
+        lang: "en",
         icons: [
+          {
+            src: "vite.svg",
+            sizes: "any",
+            type: "image/svg+xml",
+            purpose: "any maskable",
+          },
           {
             src: "vite.svg",
             sizes: "192x192",
             type: "image/svg+xml",
+          },
+          {
+            src: "vite.svg",
+            sizes: "512x512",
+            type: "image/svg+xml",
+          },
+        ],
+        screenshots: [
+          {
+            src: "vite.svg",
+            sizes: "1280x720",
+            type: "image/svg+xml",
+            form_factor: "wide",
+          },
+          {
+            src: "vite.svg",
+            sizes: "750x1334",
+            type: "image/svg+xml",
+            form_factor: "narrow",
           },
         ],
       },

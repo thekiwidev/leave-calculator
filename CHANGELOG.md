@@ -5,6 +5,20 @@ All notable changes to the Advanced Leave Calculator project will be documented 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - Full PWA Support and Branding Update
+
+- **Enhanced** Progressive Web App configuration with comprehensive manifest and service worker setup
+- **Added** PWA install banner with smart prompting and session-based dismissal tracking
+- **Updated** app branding to reflect OSGF Leave Matters Unit purpose and creator attribution
+- **Enhanced** page title and meta description highlighting app purpose for leave drafting process
+- **Added** advanced PWA manifest with proper icons, screenshots, and app categorization
+- **Updated** header to "Leave Calculator" with subtitle crediting Adedotun and OSGF purpose
+- **Enhanced** footer with creator contact information (website: <https://adedotun.xyz>, email: <thekiwidev@adedotun.xyz>)
+- **Added** runtime API caching for improved offline experience with NetworkFirst strategy
+- **Enhanced** PWA installability with proper display mode detection and install prompting
+- **Added** comprehensive meta tags for SEO, Open Graph, and Twitter card support
+- **Improved** offline-first capabilities with enhanced service worker caching strategies
+
 ## [1.3.2] - Resumption Date Adjustment Transparency
 
 - **Added** resumption date adjustment explanation when resumption falls on public holiday or weekend
