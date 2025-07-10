@@ -200,23 +200,56 @@ export const subscribeToHolidayChanges = (
       console.error("Error in initial holiday fetch:", error);
     });
 
-  // Set up real-time subscription
+  // Set up real-time subscription with specific handlers for each event type
   const channel = supabase
     .channel("public_holidays_changes")
     .on(
       "postgres_changes",
       {
-        event: "*", // Listen to all events (INSERT, UPDATE, DELETE)
+        event: "INSERT",
         schema: "public",
         table: "public_holidays",
       },
       (payload) => {
-        console.log("Holiday change received:", payload);
-        // Refetch all holidays when any change occurs
+        console.log("Holiday added:", payload);
+        // For inserts, just fetch all to maintain sorted order
         fetchHolidaysFromSupabase()
           .then(callback)
           .catch((error) => {
-            console.error("Error refetching holidays after change:", error);
+            console.error("Error refetching holidays after insert:", error);
+          });
+      }
+    )
+    .on(
+      "postgres_changes",
+      {
+        event: "DELETE",
+        schema: "public",
+        table: "public_holidays",
+      },
+      (payload) => {
+        console.log("Holiday deleted:", payload);
+        // For deletes, just fetch all to ensure consistency
+        fetchHolidaysFromSupabase()
+          .then(callback)
+          .catch((error) => {
+            console.error("Error refetching holidays after delete:", error);
+          });
+      }
+    )
+    .on(
+      "postgres_changes",
+      {
+        event: "UPDATE",
+        schema: "public",
+        table: "public_holidays",
+      },
+      (payload) => {
+        console.log("Holiday updated:", payload);
+        fetchHolidaysFromSupabase()
+          .then(callback)
+          .catch((error) => {
+            console.error("Error refetching holidays after update:", error);
           });
       }
     )
@@ -377,24 +410,63 @@ export const subscribeToNotPublicHolidayChanges = (
       console.error("Error in initial not public holiday fetch:", error);
     });
 
-  // Set up real-time subscription
+  // Set up real-time subscription with specific handlers for each event type
   const channel = supabase
     .channel("not_public_holidays_changes")
     .on(
       "postgres_changes",
       {
-        event: "*", // Listen to all events (INSERT, UPDATE, DELETE)
+        event: "INSERT",
         schema: "public",
         table: "not_public_holidays",
       },
       (payload) => {
-        console.log("Not public holiday change received:", payload);
-        // Refetch all not public holidays when any change occurs
+        console.log("Not public holiday added:", payload);
+        // For inserts, fetch all to maintain sorted order
         fetchNotPublicHolidaysFromSupabase()
           .then(callback)
           .catch((error) => {
             console.error(
-              "Error refetching not public holidays after change:",
+              "Error refetching not public holidays after insert:",
+              error
+            );
+          });
+      }
+    )
+    .on(
+      "postgres_changes",
+      {
+        event: "DELETE",
+        schema: "public",
+        table: "not_public_holidays",
+      },
+      (payload) => {
+        console.log("Not public holiday deleted:", payload);
+        // For deletes, fetch all to ensure consistency
+        fetchNotPublicHolidaysFromSupabase()
+          .then(callback)
+          .catch((error) => {
+            console.error(
+              "Error refetching not public holidays after delete:",
+              error
+            );
+          });
+      }
+    )
+    .on(
+      "postgres_changes",
+      {
+        event: "UPDATE",
+        schema: "public",
+        table: "not_public_holidays",
+      },
+      (payload) => {
+        console.log("Not public holiday updated:", payload);
+        fetchNotPublicHolidaysFromSupabase()
+          .then(callback)
+          .catch((error) => {
+            console.error(
+              "Error refetching not public holidays after update:",
               error
             );
           });
