@@ -9,6 +9,7 @@ import { Calendar as CalendarComponent } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Popover,
@@ -44,7 +45,7 @@ export function NotPublicHolidayManager() {
   const [newDate, setNewDate] = useState<Date>();
   const [newName, setNewName] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const [selectedDates, setSelectedDates] = useState<Set<string>>(new Set());
 
   const handleAddDate = () => {
@@ -99,33 +100,32 @@ export function NotPublicHolidayManager() {
       onOpenChange={(open) => setIsCollapsed(!open)}
     >
       <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-5 w-5" />
-              <CardTitle>
-                Not Public Holiday Dates
-                {notPublicHolidayDates.length > 0 && (
-                  <span className="ml-2 text-sm font-normal text-muted-foreground">
-                    ({notPublicHolidayDates.length})
-                  </span>
-                )}
-              </CardTitle>
-            </div>
-            <CollapsibleTrigger asChild>
-              <Button variant="ghost" size="sm">
+        <CollapsibleTrigger asChild>
+          <CardHeader className="hover:bg-muted/50 transition-colors cursor-pointer">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
                 {isCollapsed ? (
-                  <ChevronDown className="h-4 w-4" />
+                  <ChevronDown className="w-5 h-5 text-muted-foreground" />
                 ) : (
-                  <ChevronUp className="h-4 w-4" />
+                  <ChevronUp className="w-5 h-5 text-muted-foreground" />
                 )}
-              </Button>
-            </CollapsibleTrigger>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            Manage dates that should NOT be treated as public holidays
-          </p>
-        </CardHeader>
+                <div>
+                  <CardTitle className="text-lg">
+                    Not Public Holiday Dates{" "}
+                    <Badge variant="secondary" className="ml-2">
+                      {notPublicHolidayDates.length}
+                    </Badge>
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    {isCollapsed
+                      ? "Click to expand"
+                      : "Manage dates that should NOT be treated as public holidays"}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardHeader>
+        </CollapsibleTrigger>
 
         <CollapsibleContent>
           <CardContent className="space-y-4">

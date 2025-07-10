@@ -11,6 +11,10 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: "autoUpdate",
+      devOptions: {
+        enabled: true,
+        type: "module",
+      },
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff,woff2,ttf}"],
         runtimeCaching: [
@@ -71,6 +75,22 @@ export default defineConfig({
             sizes: "512x512",
             type: "image/png",
             purpose: "maskable",
+          },
+        ],
+        screenshots: [
+          {
+            src: "screenshot-desktop.png",
+            sizes: "3338x1844",
+            type: "image/png",
+            form_factor: "wide",
+            label: "Leave Calculator Desktop View",
+          },
+          {
+            src: "screenshot-mobile.png",
+            sizes: "1284x2778",
+            type: "image/png",
+            form_factor: "narrow",
+            label: "Leave Calculator Mobile View",
           },
         ],
       },
