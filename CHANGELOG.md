@@ -5,6 +5,16 @@ All notable changes to the Advanced Leave Calculator project will be documented 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - Weekend Holiday Handling and UI Improvements
+
+- **Added** automatic shifting of weekend public holidays to next working day
+- **Added** "(observed)" marking for shifted holidays to distinguish from original dates
+- **Fixed** manual holiday addition now properly saves to localStorage
+- **Improved** Grade Level selection simplified to two options: "GL 01-06" and "GL 07-17"
+- **Added** collapsible public holidays section for better space management
+- **Enhanced** holiday processing logic to handle weekend shifts seamlessly
+- **Improved** user experience with clearer holiday management interface
+
 ## [1.0.0] - Complete Rewrite and Modernization
 
 - **Complete rewrite** of the leave calculator using modern technologies

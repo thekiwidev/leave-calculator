@@ -102,12 +102,8 @@ export function LeaveCalculatorForm() {
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
             <option value="">Select Grade Level</option>
-            {Array.from({ length: 18 }, (_, i) => (
-              <option key={i} value={i}>
-                GL {i.toString().padStart(2, "0")}{" "}
-                {i <= 6 ? "(21 days)" : "(30 days)"}
-              </option>
-            ))}
+            <option value={3}>GL 01 - 06 (21 working days)</option>
+            <option value={7}>GL 07 - 17 (30 working days)</option>
           </select>
         </div>
       )}

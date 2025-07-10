@@ -6,7 +6,7 @@ import type {
   PublicHoliday,
   LeaveType,
 } from "@/types";
-import { isWorkingDay, getNextWorkingDay } from "@/utils/dateUtils";
+import { isWorkingDay, getNextWorkingDay, processPublicHolidays } from "@/utils/dateUtils";
 
 /**
  * Determine number of leave days based on leave type and grade level
@@ -56,6 +56,9 @@ export const calculateLeave = (
   input: LeaveCalculationInput,
   publicHolidays: PublicHoliday[]
 ): LeaveCalculationResult => {
+  // Process public holidays to handle weekend shifts
+  const processedHolidays = processPublicHolidays(publicHolidays);
+  
   // Get the number of leave days based on leave type
   const totalLeaveDays = getLeaveEntitlement(
     input.leaveType,
@@ -73,12 +76,12 @@ export const calculateLeave = (
     const currentDateISO = format(currentDate, "yyyy-MM-dd");
 
     // Check if current date is a working day
-    if (isWorkingDay(currentDateISO, publicHolidays)) {
+    if (isWorkingDay(currentDateISO, processedHolidays)) {
       // It's a working day, count it
       workingDaysCount++;
     } else {
       // Check if it's a public holiday (not just weekend)
-      const holiday = publicHolidays.find((h) => h.date === currentDateISO);
+      const holiday = processedHolidays.find((h) => h.date === currentDateISO);
       if (holiday) {
         // Add to skipped holidays list
         skippedHolidays.push(holiday);
@@ -95,7 +98,7 @@ export const calculateLeave = (
   const leaveExpirationDate = format(addDays(currentDate, -1), "yyyy-MM-dd");
 
   // Resumption date is the first working day after leave expiration
-  const resumptionDate = getNextWorkingDay(leaveExpirationDate, publicHolidays);
+  const resumptionDate = getNextWorkingDay(leaveExpirationDate, processedHolidays);
 
   return {
     leaveExpirationDate,
