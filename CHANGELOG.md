@@ -5,6 +5,18 @@ All notable changes to the Advanced Leave Calculator project will be documented 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.4] - Enhanced Offline Support and Sync Management
+
+- **Enhanced** holiday management with proper offline-first functionality
+- **Added** comprehensive local storage management for both public and not-public holidays
+- **Improved** sync state tracking with pending actions and sync status
+- **Added** batch delete operations with offline support
+- **Enhanced** duplicate prevention logic for both online and offline states
+- **Added** automatic sync retry when connection is restored
+- **Fixed** holidays visibility in offline mode
+- **Improved** error handling during sync operations
+- **Enhanced** merge strategy for resolving conflicts between local and remote data
+
 ## [2.0.3] - Result View Responsiveness Fix
 
 - **Fixed** empty result placeholder now shows properly on desktop
