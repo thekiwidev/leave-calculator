@@ -13,11 +13,27 @@ function App() {
   const initializeStore = useLeaveCalculatorStore(
     (state) => state.initializeStore
   );
+  const cleanupHolidaySubscription = useLeaveCalculatorStore(
+    (state) => state.cleanupHolidaySubscription
+  );
+  const cleanupNotPublicHolidaySubscription = useLeaveCalculatorStore(
+    (state) => state.cleanupNotPublicHolidaySubscription
+  );
 
   // Initialize the store when the app loads
   useEffect(() => {
     initializeStore();
-  }, [initializeStore]);
+
+    // Cleanup subscriptions when app unmounts
+    return () => {
+      cleanupHolidaySubscription();
+      cleanupNotPublicHolidaySubscription();
+    };
+  }, [
+    initializeStore,
+    cleanupHolidaySubscription,
+    cleanupNotPublicHolidaySubscription,
+  ]);
 
   return (
     <div className="min-h-screen bg-background flex flex-col">

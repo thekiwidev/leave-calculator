@@ -1,6 +1,14 @@
 //@ui: Component for managing dates that should not be treated as public holidays
 import { useState } from "react";
-import { Plus, Trash2, Calendar, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  Plus,
+  Trash2,
+  Calendar,
+  ChevronDown,
+  ChevronUp,
+  AlertCircle,
+  Loader,
+} from "lucide-react";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -38,30 +46,49 @@ import { formatDateWithDay } from "@/utils/dateUtils";
 export function NotPublicHolidayManager() {
   const {
     notPublicHolidayDates,
+    isLoadingNotPublicHolidays,
+    notPublicHolidayError,
     addNotPublicHolidayDate,
     removeNotPublicHolidayDate,
+    removeMultipleNotPublicHolidayDates,
   } = useLeaveCalculatorStore();
 
   const [newDate, setNewDate] = useState<Date>();
   const [newName, setNewName] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isAddingDate, setIsAddingDate] = useState(false); // Loading state for add operation
   const [selectedDates, setSelectedDates] = useState<Set<string>>(new Set());
 
-  const handleAddDate = () => {
+  const handleAddDate = async () => {
     if (newDate && newName.trim()) {
-      addNotPublicHolidayDate({
-        name: newName.trim(),
-        date: format(newDate, "yyyy-MM-dd"),
-      });
-      setNewDate(undefined);
-      setNewName("");
-      setIsOpen(false);
+      setIsAddingDate(true);
+
+      try {
+        await addNotPublicHolidayDate({
+          name: newName.trim(),
+          date: format(newDate, "yyyy-MM-dd"),
+        });
+
+        setNewDate(undefined);
+        setNewName("");
+        setIsOpen(false);
+      } catch (error) {
+        // Error is already handled in the store and shown in notPublicHolidayError
+        console.error("Failed to add not public holiday:", error);
+      } finally {
+        setIsAddingDate(false);
+      }
     }
   };
 
-  const handleRemoveDate = (date: string) => {
-    removeNotPublicHolidayDate(date);
+  const handleRemoveDate = async (date: string) => {
+    try {
+      await removeNotPublicHolidayDate(date);
+    } catch (error) {
+      // Error is already handled in the store
+      console.error("Failed to remove not public holiday:", error);
+    }
   };
 
   const handleSelectAll = (checked: boolean) => {
@@ -82,11 +109,14 @@ export function NotPublicHolidayManager() {
     setSelectedDates(newSelected);
   };
 
-  const handleBatchDelete = () => {
-    selectedDates.forEach((date) => {
-      removeNotPublicHolidayDate(date);
-    });
-    setSelectedDates(new Set());
+  const handleBatchDelete = async () => {
+    try {
+      await removeMultipleNotPublicHolidayDates(Array.from(selectedDates));
+      setSelectedDates(new Set());
+    } catch (error) {
+      // Error is already handled in the store
+      console.error("Failed to remove multiple not public holidays:", error);
+    }
   };
 
   const isAllSelected =
@@ -129,6 +159,23 @@ export function NotPublicHolidayManager() {
 
         <CollapsibleContent>
           <CardContent className="space-y-4">
+            {/* Error Display */}
+            {notPublicHolidayError && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
+                <div className="flex">
+                  <AlertCircle className="w-5 h-5 text-yellow-400 mt-0.5 mr-2" />
+                  <div>
+                    <h4 className="text-sm font-medium text-yellow-800">
+                      Notice
+                    </h4>
+                    <p className="text-sm text-yellow-700 mt-1">
+                      {notPublicHolidayError}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Add new date form */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div className="space-y-2">
@@ -173,11 +220,20 @@ export function NotPublicHolidayManager() {
                 <Label className="text-transparent">Action</Label>
                 <Button
                   onClick={handleAddDate}
-                  disabled={!newDate || !newName.trim()}
+                  disabled={!newDate || !newName.trim() || isAddingDate}
                   className="w-full"
                 >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Date
+                  {isAddingDate ? (
+                    <>
+                      <Loader className="h-4 w-4 mr-2 animate-spin" />
+                      Adding...
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Date
+                    </>
+                  )}
                 </Button>
               </div>
             </div>
@@ -267,7 +323,17 @@ export function NotPublicHolidayManager() {
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
                             <AlertDialogAction
-                              onClick={() => handleRemoveDate(dateItem.date)}
+                              onClick={async () => {
+                                try {
+                                  await handleRemoveDate(dateItem.date);
+                                } catch (error) {
+                                  // Error is already handled in the store
+                                  console.error(
+                                    "Failed to delete not public holiday:",
+                                    error
+                                  );
+                                }
+                              }}
                             >
                               Delete
                             </AlertDialogAction>
@@ -280,13 +346,26 @@ export function NotPublicHolidayManager() {
               </div>
             )}
 
-            {notPublicHolidayDates.length === 0 && (
-              <div className="text-center py-8 text-muted-foreground">
-                <Calendar className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                <p>No excluded dates added yet</p>
-                <p className="text-sm">
-                  Add dates that should not be treated as public holidays
-                </p>
+            {notPublicHolidayDates.length === 0 &&
+              !isLoadingNotPublicHolidays && (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Calendar className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                  <p>No excluded dates added yet</p>
+                  <p className="text-sm">
+                    Add dates that should not be treated as public holidays
+                  </p>
+                </div>
+              )}
+
+            {/* Loading State */}
+            {isLoadingNotPublicHolidays && (
+              <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+                <div className="flex items-center">
+                  <Loader className="w-5 h-5 text-blue-600 mr-2 animate-spin" />
+                  <p className="text-sm text-blue-800">
+                    Updating excluded dates...
+                  </p>
+                </div>
               </div>
             )}
           </CardContent>

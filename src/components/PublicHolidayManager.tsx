@@ -52,6 +52,7 @@ export function PublicHolidayManager() {
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(true); // @comment: Default to collapsed
+  const [isAddingHoliday, setIsAddingHoliday] = useState(false); // @comment: Loading state for add operation
   const [newHoliday, setNewHoliday] = useState<PublicHoliday>({
     name: "",
     date: "",
@@ -61,19 +62,28 @@ export function PublicHolidayManager() {
   );
 
   // Handle adding a new holiday
-  const handleAddHoliday = () => {
+  const handleAddHoliday = async () => {
     if (!newHoliday.name.trim() || !newHoliday.date) {
       return;
     }
 
-    addPublicHoliday({
-      name: newHoliday.name.trim(),
-      date: newHoliday.date,
-    });
+    setIsAddingHoliday(true); // @comment: Start loading state
 
-    // Reset form
-    setNewHoliday({ name: "", date: "" });
-    setShowAddForm(false);
+    try {
+      await addPublicHoliday({
+        name: newHoliday.name.trim(),
+        date: newHoliday.date,
+      });
+
+      // Reset form
+      setNewHoliday({ name: "", date: "" });
+      setShowAddForm(false);
+    } catch (error) {
+      // Error is already handled in the store and shown in holidayError
+      console.error("Failed to add holiday:", error);
+    } finally {
+      setIsAddingHoliday(false); // @comment: End loading state
+    }
   };
 
   // Batch operation handlers
@@ -95,9 +105,14 @@ export function PublicHolidayManager() {
     setSelectedHolidays(newSelected);
   };
 
-  const handleBatchDelete = () => {
-    removeMultiplePublicHolidays(Array.from(selectedHolidays));
-    setSelectedHolidays(new Set());
+  const handleBatchDelete = async () => {
+    try {
+      await removeMultiplePublicHolidays(Array.from(selectedHolidays));
+      setSelectedHolidays(new Set());
+    } catch (error) {
+      // Error is already handled in the store and shown in holidayError
+      console.error("Failed to delete holidays:", error);
+    }
   };
 
   const isAllSelected =
@@ -233,10 +248,21 @@ export function PublicHolidayManager() {
                     </Button>
                     <Button
                       onClick={handleAddHoliday}
-                      disabled={!newHoliday.name.trim() || !newHoliday.date}
+                      disabled={
+                        !newHoliday.name.trim() ||
+                        !newHoliday.date ||
+                        isAddingHoliday
+                      }
                       size="sm"
                     >
-                      Add
+                      {isAddingHoliday ? (
+                        <>
+                          <Loader className="w-4 h-4 mr-1 animate-spin" />
+                          Adding...
+                        </>
+                      ) : (
+                        "Add"
+                      )}
                     </Button>
                   </div>
                 </CardContent>
@@ -367,9 +393,17 @@ export function PublicHolidayManager() {
                               <AlertDialogFooter>
                                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                                 <AlertDialogAction
-                                  onClick={() =>
-                                    removePublicHoliday(holiday.date)
-                                  }
+                                  onClick={async () => {
+                                    try {
+                                      await removePublicHoliday(holiday.date);
+                                    } catch (error) {
+                                      // Error is already handled in the store
+                                      console.error(
+                                        "Failed to delete holiday:",
+                                        error
+                                      );
+                                    }
+                                  }}
                                 >
                                   Delete
                                 </AlertDialogAction>

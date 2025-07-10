@@ -1,4 +1,4 @@
-//@store: Zustand store for application state management
+//@store: Zustand store for application state management with Supabase integration
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type {
@@ -11,13 +11,23 @@ import type {
   ApiHolidayResponse,
 } from "@/types";
 import {
-  savePublicHolidays,
-  loadPublicHolidays,
   saveLastUsedGL,
   saveLastSelectedLeaveType,
   loadLastUsedGL,
   loadLastSelectedLeaveType,
 } from "@/utils/storage";
+import {
+  fetchHolidaysFromSupabase,
+  addHolidayToSupabase,
+  removeHolidayFromSupabase,
+  removeMultipleHolidaysFromSupabase,
+  syncApiHolidaysToSupabase,
+  subscribeToHolidayChanges,
+  addNotPublicHolidayToSupabase,
+  removeNotPublicHolidayFromSupabase,
+  removeMultipleNotPublicHolidaysFromSupabase,
+  subscribeToNotPublicHolidayChanges,
+} from "@/lib/supabaseService";
 
 interface LeaveCalculatorState {
   // Public holidays
@@ -27,6 +37,8 @@ interface LeaveCalculatorState {
 
   // Not public holiday dates (dates to exclude from holiday treatment)
   notPublicHolidayDates: NotPublicHolidayDate[];
+  isLoadingNotPublicHolidays: boolean;
+  notPublicHolidayError: string | null;
 
   // Leave calculation
   leaveInput: LeaveCalculationInput;
@@ -38,16 +50,26 @@ interface LeaveCalculatorState {
   lastUsedGL: GradeLevel | null;
   lastSelectedLeaveType: LeaveType | null;
 
+  // Real-time subscription cleanup
+  unsubscribeFromHolidays: (() => void) | null;
+  unsubscribeFromNotPublicHolidays: (() => void) | null;
+
   // Actions
   setPublicHolidays: (holidays: PublicHoliday[]) => void;
-  addPublicHoliday: (holiday: PublicHoliday) => void;
-  removePublicHoliday: (date: string) => void;
-  removeMultiplePublicHolidays: (dates: string[]) => void;
+  addPublicHoliday: (holiday: PublicHoliday) => Promise<void>;
+  removePublicHoliday: (date: string) => Promise<void>;
+  removeMultiplePublicHolidays: (dates: string[]) => Promise<void>;
   fetchPublicHolidays: () => Promise<void>;
+  initializeHolidaySubscription: () => void;
+  cleanupHolidaySubscription: () => void;
 
   // Not public holiday actions
-  addNotPublicHolidayDate: (date: NotPublicHolidayDate) => void;
-  removeNotPublicHolidayDate: (date: string) => void;
+  setNotPublicHolidayDates: (dates: NotPublicHolidayDate[]) => void;
+  addNotPublicHolidayDate: (date: NotPublicHolidayDate) => Promise<void>;
+  removeNotPublicHolidayDate: (date: string) => Promise<void>;
+  removeMultipleNotPublicHolidayDates: (dates: string[]) => Promise<void>;
+  initializeNotPublicHolidaySubscription: () => void;
+  cleanupNotPublicHolidaySubscription: () => void;
 
   setLeaveInput: (input: Partial<LeaveCalculationInput>) => void;
   setLeaveResult: (result: LeaveCalculationResult | null) => void;
@@ -66,6 +88,8 @@ export const useLeaveCalculatorStore = create<LeaveCalculatorState>()(
       holidayError: null,
 
       notPublicHolidayDates: [],
+      isLoadingNotPublicHolidays: false,
+      notPublicHolidayError: null,
 
       leaveInput: {
         leaveType: "vacation",
@@ -79,104 +103,185 @@ export const useLeaveCalculatorStore = create<LeaveCalculatorState>()(
 
       lastUsedGL: null,
       lastSelectedLeaveType: null,
+      unsubscribeFromHolidays: null,
+      unsubscribeFromNotPublicHolidays: null,
 
       // Actions
       setPublicHolidays: (holidays) => {
-        // Preserve manually added holidays
-        const currentHolidays = get().publicHolidays;
-        const manualHolidays = currentHolidays.filter((h) => h.isManual);
-
-        // Merge API holidays with manual holidays, avoiding duplicates
-        const apiHolidays = holidays.filter((h) => !h.isManual);
-        const allHolidays = [...manualHolidays];
-
-        apiHolidays.forEach((apiHoliday) => {
-          const exists = allHolidays.some((h) => h.date === apiHoliday.date);
-          if (!exists) {
-            allHolidays.push(apiHoliday);
-          }
-        });
-
-        const sortedHolidays = allHolidays.sort((a, b) =>
+        // Sort holidays by date
+        const sortedHolidays = holidays.sort((a, b) =>
           a.date.localeCompare(b.date)
         );
-
         set({ publicHolidays: sortedHolidays });
-        savePublicHolidays(sortedHolidays);
       },
 
-      addPublicHoliday: (holiday) => {
-        const currentHolidays = get().publicHolidays;
+      addPublicHoliday: async (holiday) => {
+        set({ isLoadingHolidays: true, holidayError: null });
 
-        // Check for duplicate dates
-        const isDuplicate = currentHolidays.some(
-          (h) => h.date === holiday.date
-        );
-        if (isDuplicate) {
-          set({ holidayError: "A holiday already exists on this date" });
-          return;
+        try {
+          const newHoliday = await addHolidayToSupabase(holiday);
+          // The real-time subscription will update the state automatically
+          console.log("Holiday added successfully:", newHoliday);
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error ? error.message : "Failed to add holiday";
+          set({ holidayError: errorMessage });
+          throw error;
+        } finally {
+          set({ isLoadingHolidays: false });
         }
+      },
 
-        const newHoliday = { ...holiday, isManual: true };
-        const newHolidays = [...currentHolidays, newHoliday].sort((a, b) =>
-          a.date.localeCompare(b.date)
-        );
+      removePublicHoliday: async (date) => {
+        set({ isLoadingHolidays: true, holidayError: null });
 
-        set({
-          publicHolidays: newHolidays,
-          holidayError: null,
+        try {
+          await removeHolidayFromSupabase(date);
+          // The real-time subscription will update the state automatically
+          console.log("Holiday removed successfully:", date);
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error ? error.message : "Failed to remove holiday";
+          set({ holidayError: errorMessage });
+          throw error;
+        } finally {
+          set({ isLoadingHolidays: false });
+        }
+      },
+
+      removeMultiplePublicHolidays: async (dates) => {
+        set({ isLoadingHolidays: true, holidayError: null });
+
+        try {
+          await removeMultipleHolidaysFromSupabase(dates);
+          // The real-time subscription will update the state automatically
+          console.log("Multiple holidays removed successfully:", dates);
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error
+              ? error.message
+              : "Failed to remove holidays";
+          set({ holidayError: errorMessage });
+          throw error;
+        } finally {
+          set({ isLoadingHolidays: false });
+        }
+      },
+
+      initializeHolidaySubscription: () => {
+        // Clean up any existing subscription
+        const { cleanupHolidaySubscription } = get();
+        cleanupHolidaySubscription();
+
+        // Set up new subscription
+        const unsubscribe = subscribeToHolidayChanges((holidays) => {
+          get().setPublicHolidays(holidays);
+          set({ isLoadingHolidays: false, holidayError: null });
         });
-        savePublicHolidays(newHolidays);
+
+        set({ unsubscribeFromHolidays: unsubscribe });
       },
 
-      removePublicHoliday: (date) => {
-        const currentHolidays = get().publicHolidays;
-        const newHolidays = currentHolidays.filter((h) => h.date !== date);
-
-        set({ publicHolidays: newHolidays });
-        savePublicHolidays(newHolidays);
-      },
-
-      removeMultiplePublicHolidays: (dates) => {
-        const currentHolidays = get().publicHolidays;
-        const newHolidays = currentHolidays.filter(
-          (h) => !dates.includes(h.date)
-        );
-
-        set({ publicHolidays: newHolidays });
-        savePublicHolidays(newHolidays);
+      cleanupHolidaySubscription: () => {
+        const { unsubscribeFromHolidays } = get();
+        if (unsubscribeFromHolidays) {
+          unsubscribeFromHolidays();
+          set({ unsubscribeFromHolidays: null });
+        }
       },
 
       // Not public holiday date actions
-      addNotPublicHolidayDate: (dateEntry) => {
-        const currentDates = get().notPublicHolidayDates;
-
-        // Check for duplicate dates
-        const isDuplicate = currentDates.some((d) => d.date === dateEntry.date);
-        if (isDuplicate) {
-          set({ holidayError: "This date is already in the exclusion list" });
-          return;
-        }
-
-        const newDates = [...currentDates, dateEntry].sort((a, b) =>
-          a.date.localeCompare(b.date)
-        );
-
-        set({
-          notPublicHolidayDates: newDates,
-          holidayError: null,
-        });
-        // Save to localStorage
-        localStorage.setItem("notPublicHolidayDates", JSON.stringify(newDates));
+      setNotPublicHolidayDates: (dates) => {
+        // Sort dates by date
+        const sortedDates = dates.sort((a, b) => a.date.localeCompare(b.date));
+        set({ notPublicHolidayDates: sortedDates });
       },
 
-      removeNotPublicHolidayDate: (date) => {
-        const currentDates = get().notPublicHolidayDates;
-        const newDates = currentDates.filter((d) => d.date !== date);
+      addNotPublicHolidayDate: async (dateEntry) => {
+        set({ isLoadingNotPublicHolidays: true, notPublicHolidayError: null });
 
-        set({ notPublicHolidayDates: newDates });
-        // Save to localStorage
-        localStorage.setItem("notPublicHolidayDates", JSON.stringify(newDates));
+        try {
+          const newNotHoliday = await addNotPublicHolidayToSupabase(dateEntry);
+          // The real-time subscription will update the state automatically
+          console.log("Not public holiday added successfully:", newNotHoliday);
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error
+              ? error.message
+              : "Failed to add not public holiday";
+          set({ notPublicHolidayError: errorMessage });
+          throw error;
+        } finally {
+          set({ isLoadingNotPublicHolidays: false });
+        }
+      },
+
+      removeNotPublicHolidayDate: async (date) => {
+        set({ isLoadingNotPublicHolidays: true, notPublicHolidayError: null });
+
+        try {
+          await removeNotPublicHolidayFromSupabase(date);
+          // The real-time subscription will update the state automatically
+          console.log("Not public holiday removed successfully:", date);
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error
+              ? error.message
+              : "Failed to remove not public holiday";
+          set({ notPublicHolidayError: errorMessage });
+          throw error;
+        } finally {
+          set({ isLoadingNotPublicHolidays: false });
+        }
+      },
+
+      removeMultipleNotPublicHolidayDates: async (dates) => {
+        set({ isLoadingNotPublicHolidays: true, notPublicHolidayError: null });
+
+        try {
+          await removeMultipleNotPublicHolidaysFromSupabase(dates);
+          // The real-time subscription will update the state automatically
+          console.log(
+            "Multiple not public holidays removed successfully:",
+            dates
+          );
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error
+              ? error.message
+              : "Failed to remove not public holidays";
+          set({ notPublicHolidayError: errorMessage });
+          throw error;
+        } finally {
+          set({ isLoadingNotPublicHolidays: false });
+        }
+      },
+
+      initializeNotPublicHolidaySubscription: () => {
+        // Clean up any existing subscription
+        const { cleanupNotPublicHolidaySubscription } = get();
+        cleanupNotPublicHolidaySubscription();
+
+        // Set up new subscription
+        const unsubscribe = subscribeToNotPublicHolidayChanges(
+          (notHolidays) => {
+            get().setNotPublicHolidayDates(notHolidays);
+            set({
+              isLoadingNotPublicHolidays: false,
+              notPublicHolidayError: null,
+            });
+          }
+        );
+
+        set({ unsubscribeFromNotPublicHolidays: unsubscribe });
+      },
+
+      cleanupNotPublicHolidaySubscription: () => {
+        const { unsubscribeFromNotPublicHolidays } = get();
+        if (unsubscribeFromNotPublicHolidays) {
+          unsubscribeFromNotPublicHolidays();
+          set({ unsubscribeFromNotPublicHolidays: null });
+        }
       },
 
       fetchPublicHolidays: async () => {
@@ -187,7 +292,12 @@ export const useLeaveCalculatorStore = create<LeaveCalculatorState>()(
           const apiKey = import.meta.env.VITE_API_NINJAS_KEY;
 
           if (!apiKey) {
-            throw new Error("API key not configured. Using local data only.");
+            console.warn("API key not configured. Using Supabase data only.");
+            // Just fetch from Supabase without API sync
+            const holidays = await fetchHolidaysFromSupabase();
+            get().setPublicHolidays(holidays);
+            set({ isLoadingHolidays: false });
+            return;
           }
 
           const response = await fetch(
@@ -206,7 +316,7 @@ export const useLeaveCalculatorStore = create<LeaveCalculatorState>()(
           const data: ApiHolidayResponse[] = await response.json();
 
           // Transform API response to our format
-          const holidays: PublicHoliday[] = data
+          const apiHolidays: PublicHoliday[] = data
             .map((holiday) => ({
               name: holiday.name,
               date: holiday.date,
@@ -214,10 +324,20 @@ export const useLeaveCalculatorStore = create<LeaveCalculatorState>()(
             }))
             .sort((a, b) => a.date.localeCompare(b.date));
 
-          // Use setPublicHolidays to preserve manual holidays
-          const { setPublicHolidays } = get();
-          setPublicHolidays(holidays);
+          // Sync API holidays to Supabase (this will handle duplicates)
+          try {
+            const newHolidaysCount = await syncApiHolidaysToSupabase(
+              apiHolidays
+            );
+            console.log(
+              `Synced ${newHolidaysCount} new holidays from API to Supabase`
+            );
+          } catch (syncError) {
+            console.warn("Failed to sync API holidays to Supabase:", syncError);
+            // Continue execution - we can still use existing Supabase data
+          }
 
+          // The real-time subscription will automatically update our state
           set({
             isLoadingHolidays: false,
             holidayError: null,
@@ -225,10 +345,15 @@ export const useLeaveCalculatorStore = create<LeaveCalculatorState>()(
         } catch (error) {
           console.error("Failed to fetch public holidays:", error);
 
-          // Fall back to local data
-          const localHolidays = loadPublicHolidays();
+          // Fall back to Supabase data only
+          try {
+            const holidays = await fetchHolidaysFromSupabase();
+            get().setPublicHolidays(holidays);
+          } catch (supabaseError) {
+            console.error("Failed to fetch from Supabase:", supabaseError);
+          }
+
           set({
-            publicHolidays: localHolidays,
             isLoadingHolidays: false,
             holidayError:
               error instanceof Error
@@ -268,19 +393,11 @@ export const useLeaveCalculatorStore = create<LeaveCalculatorState>()(
       },
 
       initializeStore: () => {
-        // Load data from localStorage
-        const savedHolidays = loadPublicHolidays();
+        // Load user preferences from localStorage
         const savedGL = loadLastUsedGL();
         const savedLeaveType = loadLastSelectedLeaveType();
 
-        // Load not public holiday dates
-        const savedNotPublicDates = JSON.parse(
-          localStorage.getItem("notPublicHolidayDates") || "[]"
-        );
-
         set({
-          publicHolidays: savedHolidays,
-          notPublicHolidayDates: savedNotPublicDates,
           lastUsedGL: savedGL,
           lastSelectedLeaveType: savedLeaveType,
           leaveInput: {
@@ -291,10 +408,12 @@ export const useLeaveCalculatorStore = create<LeaveCalculatorState>()(
           },
         });
 
-        // Fetch fresh holidays if we don't have any
-        if (savedHolidays.length === 0) {
-          get().fetchPublicHolidays();
-        }
+        // Initialize real-time subscriptions
+        get().initializeHolidaySubscription();
+        get().initializeNotPublicHolidaySubscription();
+
+        // Fetch fresh holidays from API if available
+        get().fetchPublicHolidays();
       },
     }),
     {
