@@ -2,7 +2,7 @@
 
 For a proper PWA, you should replace the default Vite SVG with proper app icons.
 
-## Recommended Icon Sizes:
+## Recommended Icon Sizes
 
 - 192x192 PNG (required for PWA)
 - 512x512 PNG (required for PWA)
@@ -10,20 +10,20 @@ For a proper PWA, you should replace the default Vite SVG with proper app icons.
 - Favicon (32x32 PNG)
 - Favicon ICO file
 
-## Tools for Icon Generation:
+## Tools for Icon Generation
 
-1. **PWA Builder** (Microsoft): https://www.pwabuilder.com/imageGenerator
-2. **Favicon.io**: https://favicon.io/
-3. **RealFaviconGenerator**: https://realfavicongenerator.net/
+1. **PWA Builder** (Microsoft): <https://www.pwabuilder.com/imageGenerator>
+2. **Favicon.io**: <https://favicon.io/>
+3. **RealFaviconGenerator**: <https://realfavicongenerator.net/>
 
-## Instructions:
+## Instructions
 
 1. Create or design a calculator icon (perhaps a calculator with a calendar)
 2. Use any of the above tools to generate all required sizes
 3. Replace the files in the `public/` directory
 4. Update the icon paths in `vite.config.ts` manifest section
 
-## Current Icon Setup:
+## Current Icon Setup
 
 The current setup uses `vite.svg` as a placeholder. For production, replace with:
 

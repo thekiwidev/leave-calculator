@@ -30,7 +30,12 @@ export default defineConfig({
           },
         ],
       },
-      includeAssets: ["vite.svg", "apple-touch-icon.png", "masked-icon.svg"],
+      includeAssets: [
+        "favicon.ico",
+        "apple-touch-icon.png",
+        "icon-192.png",
+        "icon-512.png",
+      ],
       manifest: {
         name: "Leave Calculator - OSGF Leave Matters Unit",
         short_name: "Leave Calculator",
@@ -46,34 +51,26 @@ export default defineConfig({
         lang: "en",
         icons: [
           {
-            src: "vite.svg",
-            sizes: "any",
-            type: "image/svg+xml",
-            purpose: "any maskable",
-          },
-          {
-            src: "vite.svg",
+            src: "icon-192.png",
             sizes: "192x192",
-            type: "image/svg+xml",
+            type: "image/png",
           },
           {
-            src: "vite.svg",
+            src: "icon-512.png",
             sizes: "512x512",
-            type: "image/svg+xml",
-          },
-        ],
-        screenshots: [
-          {
-            src: "vite.svg",
-            sizes: "1280x720",
-            type: "image/svg+xml",
-            form_factor: "wide",
+            type: "image/png",
           },
           {
-            src: "vite.svg",
-            sizes: "750x1334",
-            type: "image/svg+xml",
-            form_factor: "narrow",
+            src: "icon-192.png",
+            sizes: "192x192",
+            type: "image/png",
+            purpose: "maskable",
+          },
+          {
+            src: "icon-512.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "maskable",
           },
         ],
       },

@@ -5,6 +5,15 @@ All notable changes to the Advanced Leave Calculator project will be documented 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.1] - Proper Icon and Favicon Integration
+
+- **Added** proper favicon.ico and app icons (192x192, 512x512) for professional PWA experience
+- **Added** Apple touch icon for iOS devices with proper meta tag integration
+- **Updated** PWA manifest to use proper PNG icons instead of placeholder SVG
+- **Enhanced** icon configuration with both standard and maskable icon purposes
+- **Fixed** favicon link type from SVG to proper ICO format in index.html
+- **Improved** PWA installability with proper icon assets for all device types
+
 ## [1.4.0] - Full PWA Support and Branding Update
 
 - **Enhanced** Progressive Web App configuration with comprehensive manifest and service worker setup
