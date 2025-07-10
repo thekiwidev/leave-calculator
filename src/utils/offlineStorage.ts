@@ -24,7 +24,10 @@ export const loadPublicHolidays = (): PublicHoliday[] => {
 // Save holidays to local storage
 export const savePublicHolidays = (holidays: PublicHoliday[]) => {
   try {
-    localStorage.setItem(STORAGE_KEYS.PUBLIC_HOLIDAYS, JSON.stringify(holidays));
+    localStorage.setItem(
+      STORAGE_KEYS.PUBLIC_HOLIDAYS,
+      JSON.stringify(holidays)
+    );
   } catch (error) {
     console.error("Failed to save public holidays to storage:", error);
   }
@@ -118,19 +121,19 @@ export const removePublicHolidayLocally = (
   date: string,
   existingHolidays: PublicHoliday[]
 ): PublicHoliday[] => {
-  const holidayToRemove = existingHolidays.find(h => h.date === date);
-  
+  const holidayToRemove = existingHolidays.find((h) => h.date === date);
+
   if (!holidayToRemove) return existingHolidays;
 
-  const newHolidays = existingHolidays.filter(h => h.date !== date);
-  
+  const newHolidays = existingHolidays.filter((h) => h.date !== date);
+
   // If the holiday was pending sync for add, just remove it
   // Otherwise mark it for deletion sync
-  if (!holidayToRemove.pendingSync || holidayToRemove.action !== 'add') {
+  if (!holidayToRemove.pendingSync || holidayToRemove.action !== "add") {
     newHolidays.push({
       ...holidayToRemove,
       pendingSync: !isOnline(),
-      action: "delete" as const
+      action: "delete" as const,
     });
   }
 
@@ -143,19 +146,19 @@ export const removeNotPublicHolidayLocally = (
   date: string,
   existingHolidays: NotPublicHolidayDate[]
 ): NotPublicHolidayDate[] => {
-  const holidayToRemove = existingHolidays.find(h => h.date === date);
-  
+  const holidayToRemove = existingHolidays.find((h) => h.date === date);
+
   if (!holidayToRemove) return existingHolidays;
 
-  const newHolidays = existingHolidays.filter(h => h.date !== date);
-  
+  const newHolidays = existingHolidays.filter((h) => h.date !== date);
+
   // If the holiday was pending sync for add, just remove it
   // Otherwise mark it for deletion sync
-  if (!holidayToRemove.pendingSync || holidayToRemove.action !== 'add') {
+  if (!holidayToRemove.pendingSync || holidayToRemove.action !== "add") {
     newHolidays.push({
       ...holidayToRemove,
       pendingSync: !isOnline(),
-      action: "delete" as const
+      action: "delete" as const,
     });
   }
 
@@ -166,27 +169,31 @@ export const removeNotPublicHolidayLocally = (
 // Get pending sync items
 export const getPendingSyncItems = () => {
   const publicHolidays = loadPublicHolidays().filter((h) => h.pendingSync);
-  const notPublicHolidays = loadNotPublicHolidays().filter((h) => h.pendingSync);
+  const notPublicHolidays = loadNotPublicHolidays().filter(
+    (h) => h.pendingSync
+  );
   return { publicHolidays, notPublicHolidays };
 };
 
 // Merge online and offline data
-export const mergeHolidayData = <T extends PublicHoliday | NotPublicHolidayDate>(
+export const mergeHolidayData = <
+  T extends PublicHoliday | NotPublicHolidayDate
+>(
   onlineData: T[],
   offlineData: T[]
 ): T[] => {
   const merged = [...onlineData];
-  
+
   // Apply offline changes
-  offlineData.forEach(offlineItem => {
+  offlineData.forEach((offlineItem) => {
     if (!offlineItem.pendingSync) return;
 
-    if (offlineItem.action === 'add') {
-      if (!merged.some(item => item.date === offlineItem.date)) {
+    if (offlineItem.action === "add") {
+      if (!merged.some((item) => item.date === offlineItem.date)) {
         merged.push(offlineItem);
       }
-    } else if (offlineItem.action === 'delete') {
-      const index = merged.findIndex(item => item.date === offlineItem.date);
+    } else if (offlineItem.action === "delete") {
+      const index = merged.findIndex((item) => item.date === offlineItem.date);
       if (index !== -1) {
         merged.splice(index, 1);
       }
@@ -203,11 +210,15 @@ export const clearPendingSync = (
 ) => {
   // Clear public holidays pending status
   const publicHolidays = loadPublicHolidays()
-    .filter(h => {
+    .filter((h) => {
       // Remove items that were pending deletion and are now synced
-      return !(h.pendingSync && h.action === 'delete' && publicHolidayDates.includes(h.date));
+      return !(
+        h.pendingSync &&
+        h.action === "delete" &&
+        publicHolidayDates.includes(h.date)
+      );
     })
-    .map(h => ({
+    .map((h) => ({
       ...h,
       pendingSync: publicHolidayDates.includes(h.date) ? false : h.pendingSync,
       action: publicHolidayDates.includes(h.date) ? undefined : h.action,
@@ -216,13 +227,19 @@ export const clearPendingSync = (
 
   // Clear not public holidays pending status
   const notPublicHolidays = loadNotPublicHolidays()
-    .filter(h => {
+    .filter((h) => {
       // Remove items that were pending deletion and are now synced
-      return !(h.pendingSync && h.action === 'delete' && notPublicHolidayDates.includes(h.date));
+      return !(
+        h.pendingSync &&
+        h.action === "delete" &&
+        notPublicHolidayDates.includes(h.date)
+      );
     })
-    .map(h => ({
+    .map((h) => ({
       ...h,
-      pendingSync: notPublicHolidayDates.includes(h.date) ? false : h.pendingSync,
+      pendingSync: notPublicHolidayDates.includes(h.date)
+        ? false
+        : h.pendingSync,
       action: notPublicHolidayDates.includes(h.date) ? undefined : h.action,
     }));
   saveNotPublicHolidays(notPublicHolidays);

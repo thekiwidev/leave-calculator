@@ -135,15 +135,20 @@ export const useLeaveCalculatorStore = create<LeaveCalculatorState>()(
 
         try {
           // Save locally first
-          const updatedHolidays = addPublicHolidayLocally(holiday, get().publicHolidays);
+          const updatedHolidays = addPublicHolidayLocally(
+            holiday,
+            get().publicHolidays
+          );
           set({ publicHolidays: updatedHolidays });
 
           // If online, sync with Supabase
           if (isOnline()) {
             await addHolidayToSupabase(holiday);
             // Update local storage to remove pending sync status
-            const synced = updatedHolidays.map(h => 
-              h.date === holiday.date ? { ...h, pendingSync: false, action: undefined } : h
+            const synced = updatedHolidays.map((h) =>
+              h.date === holiday.date
+                ? { ...h, pendingSync: false, action: undefined }
+                : h
             );
             savePublicHolidays(synced);
             set({ publicHolidays: synced });
@@ -163,14 +168,17 @@ export const useLeaveCalculatorStore = create<LeaveCalculatorState>()(
 
         try {
           // Remove locally first
-          const updatedHolidays = removePublicHolidayLocally(date, get().publicHolidays);
+          const updatedHolidays = removePublicHolidayLocally(
+            date,
+            get().publicHolidays
+          );
           set({ publicHolidays: updatedHolidays });
 
           // If online, sync with Supabase
           if (isOnline()) {
             await removeHolidayFromSupabase(date);
             // Update local storage to remove pending sync status
-            const synced = updatedHolidays.filter(h => h.date !== date);
+            const synced = updatedHolidays.filter((h) => h.date !== date);
             savePublicHolidays(synced);
             set({ publicHolidays: synced });
           }
@@ -199,7 +207,9 @@ export const useLeaveCalculatorStore = create<LeaveCalculatorState>()(
           if (isOnline()) {
             await removeMultipleHolidaysFromSupabase(dates);
             // Update local storage to remove pending sync status
-            const synced = updatedHolidays.filter(h => !dates.includes(h.date));
+            const synced = updatedHolidays.filter(
+              (h) => !dates.includes(h.date)
+            );
             savePublicHolidays(synced);
             set({ publicHolidays: synced });
           }
@@ -259,8 +269,10 @@ export const useLeaveCalculatorStore = create<LeaveCalculatorState>()(
           if (isOnline()) {
             await addNotPublicHolidayToSupabase(dateEntry);
             // Update local storage to remove pending sync status
-            const synced = updatedHolidays.map(h =>
-              h.date === dateEntry.date ? { ...h, pendingSync: false, action: undefined } : h
+            const synced = updatedHolidays.map((h) =>
+              h.date === dateEntry.date
+                ? { ...h, pendingSync: false, action: undefined }
+                : h
             );
             saveNotPublicHolidays(synced);
             set({ notPublicHolidayDates: synced });
@@ -292,7 +304,7 @@ export const useLeaveCalculatorStore = create<LeaveCalculatorState>()(
           if (isOnline()) {
             await removeNotPublicHolidayFromSupabase(date);
             // Update local storage to remove pending sync status
-            const synced = updatedHolidays.filter(h => h.date !== date);
+            const synced = updatedHolidays.filter((h) => h.date !== date);
             saveNotPublicHolidays(synced);
             set({ notPublicHolidayDates: synced });
           }
@@ -315,7 +327,10 @@ export const useLeaveCalculatorStore = create<LeaveCalculatorState>()(
           // Remove each holiday locally first
           let updatedHolidays = get().notPublicHolidayDates;
           for (const date of dates) {
-            updatedHolidays = removeNotPublicHolidayLocally(date, updatedHolidays);
+            updatedHolidays = removeNotPublicHolidayLocally(
+              date,
+              updatedHolidays
+            );
           }
           set({ notPublicHolidayDates: updatedHolidays });
 
@@ -323,7 +338,9 @@ export const useLeaveCalculatorStore = create<LeaveCalculatorState>()(
           if (isOnline()) {
             await removeMultipleNotPublicHolidaysFromSupabase(dates);
             // Update local storage to remove pending sync status
-            const synced = updatedHolidays.filter(h => !dates.includes(h.date));
+            const synced = updatedHolidays.filter(
+              (h) => !dates.includes(h.date)
+            );
             saveNotPublicHolidays(synced);
             set({ notPublicHolidayDates: synced });
           }
@@ -479,37 +496,37 @@ export const useLeaveCalculatorStore = create<LeaveCalculatorState>()(
         if (!isOnline()) return;
 
         const { publicHolidays, notPublicHolidays } = getPendingSyncItems();
-        
+
         // Sync public holidays
         for (const holiday of publicHolidays) {
           try {
-            if (holiday.action === 'add') {
+            if (holiday.action === "add") {
               await addHolidayToSupabase(holiday);
-            } else if (holiday.action === 'delete') {
+            } else if (holiday.action === "delete") {
               await removeHolidayFromSupabase(holiday.date);
             }
           } catch (error) {
-            console.error('Failed to sync holiday:', holiday, error);
+            console.error("Failed to sync holiday:", holiday, error);
           }
         }
 
         // Sync not public holidays
         for (const holiday of notPublicHolidays) {
           try {
-            if (holiday.action === 'add') {
+            if (holiday.action === "add") {
               await addNotPublicHolidayToSupabase(holiday);
-            } else if (holiday.action === 'delete') {
+            } else if (holiday.action === "delete") {
               await removeNotPublicHolidayFromSupabase(holiday.date);
             }
           } catch (error) {
-            console.error('Failed to sync not public holiday:', holiday, error);
+            console.error("Failed to sync not public holiday:", holiday, error);
           }
         }
 
         // Clear sync flags for successfully synced items
         clearPendingSync(
-          publicHolidays.map(h => h.date),
-          notPublicHolidays.map(h => h.date)
+          publicHolidays.map((h) => h.date),
+          notPublicHolidays.map((h) => h.date)
         );
       },
 

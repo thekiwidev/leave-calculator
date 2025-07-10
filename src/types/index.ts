@@ -8,7 +8,7 @@ export interface PublicHoliday {
   date: string; // ISO 8601 format (YYYY-MM-DD)
   isManual?: boolean; // True if manually added, false/undefined if from API
   pendingSync?: boolean; // True if added offline and needs to be synced
-  action?: 'add' | 'delete'; // The pending action for sync
+  action?: "add" | "delete"; // The pending action for sync
 }
 
 /**
@@ -18,7 +18,7 @@ export interface NotPublicHolidayDate {
   name: string;
   date: string; // ISO 8601 format (YYYY-MM-DD)
   pendingSync?: boolean; // True if added offline and needs to be synced
-  action?: 'add' | 'delete'; // The pending action for sync
+  action?: "add" | "delete"; // The pending action for sync
 }
 
 /**
