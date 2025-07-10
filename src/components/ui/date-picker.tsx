@@ -34,7 +34,14 @@ export function DatePicker({
   const handleDateSelect = (date: Date | undefined) => {
     if (date) {
       // Create a new date at local noon to avoid timezone issues
-      const localDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0);
+      const localDate = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+        12,
+        0,
+        0
+      );
       onChange?.(localDate);
     } else {
       onChange?.(undefined);

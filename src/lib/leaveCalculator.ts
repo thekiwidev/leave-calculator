@@ -67,9 +67,9 @@ export const calculateLeave = (
   const processedHolidays = processPublicHolidays(publicHolidays);
 
   // Filter out dates that are marked as "not public holidays"
-  const notPublicHolidayDateStrings = notPublicHolidayDates.map(d => d.date);
+  const notPublicHolidayDateStrings = notPublicHolidayDates.map((d) => d.date);
   const filteredHolidays = processedHolidays.filter(
-    holiday => !notPublicHolidayDateStrings.includes(holiday.date)
+    (holiday) => !notPublicHolidayDateStrings.includes(holiday.date)
   );
 
   // Get the number of leave days based on leave type
@@ -121,11 +121,16 @@ export const calculateLeave = (
     resumptionDate: resumptionDetails.nextWorkingDay,
     skippedHolidays,
     totalWorkingDays: totalLeaveDays,
-    resumptionAdjustment: resumptionDetails.wasAdjusted ? {
-      originalDate: format(addDays(parseISO(leaveExpirationDate), 1), "yyyy-MM-dd"),
-      reason: resumptionDetails.reason,
-      adjustedHolidays: resumptionDetails.adjustedHolidays,
-    } : undefined,
+    resumptionAdjustment: resumptionDetails.wasAdjusted
+      ? {
+          originalDate: format(
+            addDays(parseISO(leaveExpirationDate), 1),
+            "yyyy-MM-dd"
+          ),
+          reason: resumptionDetails.reason,
+          adjustedHolidays: resumptionDetails.adjustedHolidays,
+        }
+      : undefined,
   };
 };
 

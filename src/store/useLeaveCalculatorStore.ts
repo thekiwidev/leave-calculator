@@ -84,21 +84,23 @@ export const useLeaveCalculatorStore = create<LeaveCalculatorState>()(
       setPublicHolidays: (holidays) => {
         // Preserve manually added holidays
         const currentHolidays = get().publicHolidays;
-        const manualHolidays = currentHolidays.filter(h => h.isManual);
-        
+        const manualHolidays = currentHolidays.filter((h) => h.isManual);
+
         // Merge API holidays with manual holidays, avoiding duplicates
-        const apiHolidays = holidays.filter(h => !h.isManual);
+        const apiHolidays = holidays.filter((h) => !h.isManual);
         const allHolidays = [...manualHolidays];
-        
-        apiHolidays.forEach(apiHoliday => {
-          const exists = allHolidays.some(h => h.date === apiHoliday.date);
+
+        apiHolidays.forEach((apiHoliday) => {
+          const exists = allHolidays.some((h) => h.date === apiHoliday.date);
           if (!exists) {
             allHolidays.push(apiHoliday);
           }
         });
-        
-        const sortedHolidays = allHolidays.sort((a, b) => a.date.localeCompare(b.date));
-        
+
+        const sortedHolidays = allHolidays.sort((a, b) =>
+          a.date.localeCompare(b.date)
+        );
+
         set({ publicHolidays: sortedHolidays });
         savePublicHolidays(sortedHolidays);
       },
@@ -137,7 +139,9 @@ export const useLeaveCalculatorStore = create<LeaveCalculatorState>()(
 
       removeMultiplePublicHolidays: (dates) => {
         const currentHolidays = get().publicHolidays;
-        const newHolidays = currentHolidays.filter((h) => !dates.includes(h.date));
+        const newHolidays = currentHolidays.filter(
+          (h) => !dates.includes(h.date)
+        );
 
         set({ publicHolidays: newHolidays });
         savePublicHolidays(newHolidays);
@@ -148,9 +152,7 @@ export const useLeaveCalculatorStore = create<LeaveCalculatorState>()(
         const currentDates = get().notPublicHolidayDates;
 
         // Check for duplicate dates
-        const isDuplicate = currentDates.some(
-          (d) => d.date === dateEntry.date
-        );
+        const isDuplicate = currentDates.some((d) => d.date === dateEntry.date);
         if (isDuplicate) {
           set({ holidayError: "This date is already in the exclusion list" });
           return;
@@ -165,7 +167,7 @@ export const useLeaveCalculatorStore = create<LeaveCalculatorState>()(
           holidayError: null,
         });
         // Save to localStorage
-        localStorage.setItem('notPublicHolidayDates', JSON.stringify(newDates));
+        localStorage.setItem("notPublicHolidayDates", JSON.stringify(newDates));
       },
 
       removeNotPublicHolidayDate: (date) => {
@@ -174,7 +176,7 @@ export const useLeaveCalculatorStore = create<LeaveCalculatorState>()(
 
         set({ notPublicHolidayDates: newDates });
         // Save to localStorage
-        localStorage.setItem('notPublicHolidayDates', JSON.stringify(newDates));
+        localStorage.setItem("notPublicHolidayDates", JSON.stringify(newDates));
       },
 
       fetchPublicHolidays: async () => {
@@ -215,7 +217,7 @@ export const useLeaveCalculatorStore = create<LeaveCalculatorState>()(
           // Use setPublicHolidays to preserve manual holidays
           const { setPublicHolidays } = get();
           setPublicHolidays(holidays);
-          
+
           set({
             isLoadingHolidays: false,
             holidayError: null,
@@ -270,10 +272,10 @@ export const useLeaveCalculatorStore = create<LeaveCalculatorState>()(
         const savedHolidays = loadPublicHolidays();
         const savedGL = loadLastUsedGL();
         const savedLeaveType = loadLastSelectedLeaveType();
-        
+
         // Load not public holiday dates
         const savedNotPublicDates = JSON.parse(
-          localStorage.getItem('notPublicHolidayDates') || '[]'
+          localStorage.getItem("notPublicHolidayDates") || "[]"
         );
 
         set({

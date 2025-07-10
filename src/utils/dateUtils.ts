@@ -157,13 +157,13 @@ export const getNextWorkingDayWithDetails = (
   do {
     currentDate = addDays(currentDate, 1);
     const currentDateISO = format(currentDate, "yyyy-MM-dd");
-    
+
     // Check if this day is a holiday
-    const holiday = publicHolidays.find(h => h.date === currentDateISO);
+    const holiday = publicHolidays.find((h) => h.date === currentDateISO);
     if (holiday) {
       adjustedHolidays.push(holiday);
     }
-    
+
     // Check if this day is a weekend
     const dayOfWeek = currentDate.getDay();
     if (dayOfWeek === 0 || dayOfWeek === 6) {
@@ -172,8 +172,10 @@ export const getNextWorkingDayWithDetails = (
   } while (!isWorkingDay(format(currentDate, "yyyy-MM-dd"), publicHolidays));
 
   const nextWorkingDay = format(currentDate, "yyyy-MM-dd");
-  const wasAdjusted = nextWorkingDay !== addDays(parseISO(originalDate), 1).toISOString().split('T')[0];
-  
+  const wasAdjusted =
+    nextWorkingDay !==
+    addDays(parseISO(originalDate), 1).toISOString().split("T")[0];
+
   let reason = "";
   if (adjustedHolidays.length > 0 && hasWeekend) {
     reason = "Public Holiday and Weekend";
@@ -187,6 +189,6 @@ export const getNextWorkingDayWithDetails = (
     nextWorkingDay,
     wasAdjusted,
     adjustedHolidays,
-    reason
+    reason,
   };
 };
