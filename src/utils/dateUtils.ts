@@ -108,6 +108,15 @@ export const formatDate = (date: string): string => {
 };
 
 /**
+ * Format date with day of the week for display
+ * @param date - Date to format (ISO string)
+ * @returns Formatted date string with day of the week
+ */
+export const formatDateWithDay = (date: string): string => {
+  return format(parseISO(date), "EEEE, MMMM d, yyyy");
+};
+
+/**
  * Format date for date input
  * @param date - Date to format (ISO string)
  * @returns Date in YYYY-MM-DD format
@@ -122,4 +131,62 @@ export const formatDateForInput = (date: string): string => {
  */
 export const getTodayISO = (): string => {
   return format(startOfDay(new Date()), "yyyy-MM-dd");
+};
+
+/**
+ * Get the next working day with adjustment information
+ * @param date - Starting date (ISO string)
+ * @param publicHolidays - Array of public holidays
+ * @returns Object with next working day and adjustment details
+ */
+export const getNextWorkingDayWithDetails = (
+  date: string,
+  publicHolidays: PublicHoliday[]
+): {
+  nextWorkingDay: string;
+  wasAdjusted: boolean;
+  adjustedHolidays: PublicHoliday[];
+  reason: string;
+} => {
+  let currentDate = parseISO(date);
+  const originalDate = format(currentDate, "yyyy-MM-dd");
+  const adjustedHolidays: PublicHoliday[] = [];
+  let hasWeekend = false;
+
+  // Check if we need to move to the next day
+  do {
+    currentDate = addDays(currentDate, 1);
+    const currentDateISO = format(currentDate, "yyyy-MM-dd");
+    
+    // Check if this day is a holiday
+    const holiday = publicHolidays.find(h => h.date === currentDateISO);
+    if (holiday) {
+      adjustedHolidays.push(holiday);
+    }
+    
+    // Check if this day is a weekend
+    const dayOfWeek = currentDate.getDay();
+    if (dayOfWeek === 0 || dayOfWeek === 6) {
+      hasWeekend = true;
+    }
+  } while (!isWorkingDay(format(currentDate, "yyyy-MM-dd"), publicHolidays));
+
+  const nextWorkingDay = format(currentDate, "yyyy-MM-dd");
+  const wasAdjusted = nextWorkingDay !== addDays(parseISO(originalDate), 1).toISOString().split('T')[0];
+  
+  let reason = "";
+  if (adjustedHolidays.length > 0 && hasWeekend) {
+    reason = "Public Holiday and Weekend";
+  } else if (adjustedHolidays.length > 0) {
+    reason = "Public Holiday";
+  } else if (hasWeekend) {
+    reason = "Weekend";
+  }
+
+  return {
+    nextWorkingDay,
+    wasAdjusted,
+    adjustedHolidays,
+    reason
+  };
 };

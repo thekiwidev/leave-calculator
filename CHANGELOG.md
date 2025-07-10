@@ -5,6 +5,35 @@ All notable changes to the Advanced Leave Calculator project will be documented 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.2] - Resumption Date Adjustment Transparency
+
+- **Added** resumption date adjustment explanation when resumption falls on public holiday or weekend
+- **Added** detailed adjustment information showing original intended date vs actual working day
+- **Added** dedicated "Resumption Date Adjustment" section displaying holidays that caused date shifts
+- **Enhanced** resumption date card with inline adjustment notes for better user understanding
+- **Added** `getNextWorkingDayWithDetails()` utility function for comprehensive date adjustment tracking
+- **Improved** leave calculation result type with `resumptionAdjustment` field for transparency
+- **Enhanced** user experience by clearly explaining why resumption dates are moved to next working day
+
+## [1.3.1] - Critical Bug Fixes & UX Improvements
+
+- **Fixed** API refresh now preserves manually added public holidays instead of overwriting them
+- **Fixed** Added count display for Not Public Holiday Dates in collapsed title view
+- **Fixed** Added confirmation dialogs for all delete operations in both holiday managers
+- **Added** Batch delete functionality with checkboxes for both public holidays and excluded dates
+- **Added** Visual distinction between manual and API-sourced holidays with badges
+- **Improved** Enhanced UX with proper AlertDialog confirmations for destructive actions
+
+## [1.3.0] - Not Public Holiday Date Management & Enhanced UX
+
+- **Added** NotPublicHolidayManager component with collapsible interface for excluding specific dates from holiday treatment
+- **Added** flexible month/year navigation to all date pickers with dropdown selection (2020-2030 range)
+- **Enhanced** leave calculation engine to filter out excluded "not public holiday" dates from holiday calculations
+- **Enhanced** date display in results to show day of week (e.g., "Monday, January 15, 2024")
+- **Improved** responsive layout for large screens - changed from max-width 4xl to 7xl with better grid proportions
+- **Added** persistent storage for excluded holiday dates using localStorage integration
+- **Added** day-of-week formatting utility function for consistent date display across components
+
 ## [1.2.1] - Calendar and UX Refinements
 
 - **Fixed** calendar date selection timezone issue - now correctly selects the intended date

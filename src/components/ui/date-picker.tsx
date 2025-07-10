@@ -75,6 +75,9 @@ export function DatePicker({
             }
             return false;
           }}
+          captionLayout="dropdown"
+          fromYear={2020}
+          toYear={2030}
           initialFocus
         />
       </PopoverContent>

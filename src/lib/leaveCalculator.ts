@@ -5,10 +5,11 @@ import type {
   LeaveCalculationResult,
   PublicHoliday,
   LeaveType,
+  NotPublicHolidayDate,
 } from "@/types";
 import {
   isWorkingDay,
-  getNextWorkingDay,
+  getNextWorkingDayWithDetails,
   processPublicHolidays,
 } from "@/utils/dateUtils";
 
@@ -54,14 +55,22 @@ const getLeaveEntitlement = (
  * Calculate leave dates based on the PRD core logic
  * @param input - Leave calculation input parameters
  * @param publicHolidays - Array of public holidays
+ * @param notPublicHolidayDates - Array of dates to exclude from holiday treatment
  * @returns Leave calculation result
  */
 export const calculateLeave = (
   input: LeaveCalculationInput,
-  publicHolidays: PublicHoliday[]
+  publicHolidays: PublicHoliday[],
+  notPublicHolidayDates: NotPublicHolidayDate[] = []
 ): LeaveCalculationResult => {
   // Process public holidays to handle weekend shifts
   const processedHolidays = processPublicHolidays(publicHolidays);
+
+  // Filter out dates that are marked as "not public holidays"
+  const notPublicHolidayDateStrings = notPublicHolidayDates.map(d => d.date);
+  const filteredHolidays = processedHolidays.filter(
+    holiday => !notPublicHolidayDateStrings.includes(holiday.date)
+  );
 
   // Get the number of leave days based on leave type
   const totalLeaveDays = getLeaveEntitlement(
@@ -80,12 +89,12 @@ export const calculateLeave = (
     const currentDateISO = format(currentDate, "yyyy-MM-dd");
 
     // Check if current date is a working day
-    if (isWorkingDay(currentDateISO, processedHolidays)) {
+    if (isWorkingDay(currentDateISO, filteredHolidays)) {
       // It's a working day, count it
       workingDaysCount++;
     } else {
       // Check if it's a public holiday (not just weekend)
-      const holiday = processedHolidays.find((h) => h.date === currentDateISO);
+      const holiday = filteredHolidays.find((h) => h.date === currentDateISO);
       if (holiday) {
         // Add to skipped holidays list
         skippedHolidays.push(holiday);
@@ -102,16 +111,21 @@ export const calculateLeave = (
   const leaveExpirationDate = format(addDays(currentDate, -1), "yyyy-MM-dd");
 
   // Resumption date is the first working day after leave expiration
-  const resumptionDate = getNextWorkingDay(
+  const resumptionDetails = getNextWorkingDayWithDetails(
     leaveExpirationDate,
-    processedHolidays
+    filteredHolidays
   );
 
   return {
     leaveExpirationDate,
-    resumptionDate,
+    resumptionDate: resumptionDetails.nextWorkingDay,
     skippedHolidays,
     totalWorkingDays: totalLeaveDays,
+    resumptionAdjustment: resumptionDetails.wasAdjusted ? {
+      originalDate: format(addDays(parseISO(leaveExpirationDate), 1), "yyyy-MM-dd"),
+      reason: resumptionDetails.reason,
+      adjustedHolidays: resumptionDetails.adjustedHolidays,
+    } : undefined,
   };
 };
 

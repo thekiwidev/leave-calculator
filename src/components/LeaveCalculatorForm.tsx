@@ -23,6 +23,7 @@ export function LeaveCalculatorForm() {
   const {
     leaveInput,
     publicHolidays,
+    notPublicHolidayDates,
     setLeaveInput,
     setLeaveResult,
     setCalculationError,
@@ -49,7 +50,11 @@ export function LeaveCalculatorForm() {
 
     try {
       // Perform calculation
-      const result = calculateLeave(leaveInput, publicHolidays);
+      const result = calculateLeave(
+        leaveInput,
+        publicHolidays,
+        notPublicHolidayDates
+      );
       setLeaveResult(result);
     } catch (error) {
       const errorMessage =
@@ -160,7 +165,9 @@ export function LeaveCalculatorForm() {
           </Label>
           <DatePicker
             value={
-              leaveInput.startDate ? new Date(leaveInput.startDate + "T12:00:00") : undefined
+              leaveInput.startDate
+                ? new Date(leaveInput.startDate + "T12:00:00")
+                : undefined
             }
             onChange={(date: Date | undefined) =>
               setLeaveInput({

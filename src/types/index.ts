@@ -6,6 +6,15 @@
 export interface PublicHoliday {
   name: string;
   date: string; // ISO 8601 format (YYYY-MM-DD)
+  isManual?: boolean; // True if manually added, false/undefined if from API
+}
+
+/**
+ * Represents a date that should NOT be treated as a public holiday
+ */
+export interface NotPublicHolidayDate {
+  name: string;
+  date: string; // ISO 8601 format (YYYY-MM-DD)
 }
 
 /**
@@ -42,6 +51,11 @@ export interface LeaveCalculationResult {
   resumptionDate: string; // ISO 8601 format (YYYY-MM-DD)
   skippedHolidays: PublicHoliday[];
   totalWorkingDays: number;
+  resumptionAdjustment?: {
+    originalDate: string; // The date that would have been the resumption date
+    reason: string; // Why it was adjusted (e.g., "Public Holiday" or "Weekend")
+    adjustedHolidays: PublicHoliday[]; // Holidays that caused the adjustment
+  };
 }
 
 /**
@@ -62,6 +76,7 @@ export interface ApiHolidayResponse {
  */
 export interface LocalStorageData {
   publicHolidays: PublicHoliday[];
+  notPublicHolidayDates: NotPublicHolidayDate[];
   lastUsedGL: GradeLevel | null;
   lastSelectedLeaveType: LeaveType | null;
 }

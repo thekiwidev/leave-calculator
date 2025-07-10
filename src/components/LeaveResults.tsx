@@ -1,6 +1,6 @@
 //@component: Display leave calculation results
 import { useLeaveCalculatorStore } from "@/store/useLeaveCalculatorStore";
-import { formatDate } from "@/utils/dateUtils";
+import { formatDateWithDay } from "@/utils/dateUtils";
 import { Calendar, Clock, MapPin } from "lucide-react";
 
 // Shadcn/UI imports
@@ -27,10 +27,13 @@ export function LeaveResults() {
 
   return (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold mb-4">Leave Calculation Results</h3>
+      <h3 className="text-base font-semibold mb-4">
+        Leave Calculation Results
+      </h3>
 
       {/* Key Dates */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3">{/* Make it width-aware for better responsiveness */}
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-3">
+        {/* Make it width-aware for better responsiveness */}
         <Card className="border-red-200 bg-red-50 p-0">
           <CardContent className="p-4">
             <div className="flex items-center space-x-3">
@@ -39,8 +42,8 @@ export function LeaveResults() {
                 <h4 className="text-sm font-medium text-red-800">
                   Leave Expiration Date
                 </h4>
-                <p className="text-lg font-semibold text-red-900">
-                  {formatDate(leaveResult.leaveExpirationDate)}
+                <p className="text-base font-semibold text-red-900">
+                  {formatDateWithDay(leaveResult.leaveExpirationDate)}
                 </p>
               </div>
             </div>
@@ -51,13 +54,22 @@ export function LeaveResults() {
           <CardContent className="p-4">
             <div className="flex items-center space-x-3">
               <Calendar className="w-5 h-5 text-blue-600" />
-              <div>
+              <div className="flex-1">
                 <h4 className="text-sm font-medium text-blue-800">
                   Resumption Date
                 </h4>
-                <p className="text-lg font-semibold text-blue-900">
-                  {formatDate(leaveResult.resumptionDate)}
+                <p className="text-base font-semibold text-blue-900">
+                  {formatDateWithDay(leaveResult.resumptionDate)}
                 </p>
+                {leaveResult.resumptionAdjustment && (
+                  <p className="text-xs text-blue-700 mt-1">
+                    Adjusted from{" "}
+                    {formatDateWithDay(
+                      leaveResult.resumptionAdjustment.originalDate
+                    )}{" "}
+                    due to {leaveResult.resumptionAdjustment.reason}
+                  </p>
+                )}
               </div>
             </div>
           </CardContent>
@@ -71,7 +83,7 @@ export function LeaveResults() {
                 <h4 className="text-sm font-medium text-green-800">
                   Total Working Days
                 </h4>
-                <p className="text-lg font-semibold text-green-900">
+                <p className="text-base font-semibold text-green-900">
                   {leaveResult.totalWorkingDays} days
                 </p>
               </div>
@@ -84,7 +96,7 @@ export function LeaveResults() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">
-            Public Holidays{" "}
+            Public Holidays During Leave{" "}
             <Badge variant="secondary" className="ml-2">
               {leaveResult.skippedHolidays.length}
             </Badge>
@@ -99,7 +111,9 @@ export function LeaveResults() {
                   className="flex justify-between items-center py-2 border-b last:border-b-0"
                 >
                   <span className="font-medium">{holiday.name}</span>
-                  <Badge variant="outline">{formatDate(holiday.date)}</Badge>
+                  <Badge variant="outline">
+                    {formatDateWithDay(holiday.date)}
+                  </Badge>
                 </div>
               ))}
             </div>
@@ -110,6 +124,46 @@ export function LeaveResults() {
           )}
         </CardContent>
       </Card>
+
+      {/* Resumption Date Adjustment Details */}
+      {leaveResult.resumptionAdjustment &&
+        leaveResult.resumptionAdjustment.adjustedHolidays.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">
+                Resumption Date Adjustment{" "}
+                <Badge variant="outline" className="ml-2">
+                  {leaveResult.resumptionAdjustment.adjustedHolidays.length}
+                </Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground mb-3">
+                Your resumption date was moved from{" "}
+                {formatDateWithDay(
+                  leaveResult.resumptionAdjustment.originalDate
+                )}
+                to {formatDateWithDay(leaveResult.resumptionDate)} due to the
+                following:
+              </p>
+              <div className="space-y-2">
+                {leaveResult.resumptionAdjustment.adjustedHolidays.map(
+                  (holiday, index) => (
+                    <div
+                      key={index}
+                      className="flex justify-between items-center py-2 border-b last:border-b-0"
+                    >
+                      <span className="font-medium">{holiday.name}</span>
+                      <Badge variant="outline">
+                        {formatDateWithDay(holiday.date)}
+                      </Badge>
+                    </div>
+                  )
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
     </div>
   );
 }

@@ -8,7 +8,6 @@ import {
   RefreshCw,
   Calendar,
   AlertCircle,
-  CheckCircle,
   Loader,
   ChevronDown,
   ChevronUp,
@@ -21,11 +20,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { DatePicker } from "@/components/ui/date-picker";
 
 export function PublicHolidayManager() {
@@ -35,6 +46,7 @@ export function PublicHolidayManager() {
     holidayError,
     addPublicHoliday,
     removePublicHoliday,
+    removeMultiplePublicHolidays,
     fetchPublicHolidays,
   } = useLeaveCalculatorStore();
 
@@ -44,7 +56,9 @@ export function PublicHolidayManager() {
     name: "",
     date: "",
   });
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [selectedHolidays, setSelectedHolidays] = useState<Set<string>>(
+    new Set()
+  );
 
   // Handle adding a new holiday
   const handleAddHoliday = () => {
@@ -62,17 +76,34 @@ export function PublicHolidayManager() {
     setShowAddForm(false);
   };
 
-  // Handle removing a holiday
-  const handleRemoveHoliday = (date: string) => {
-    if (deleteConfirm === date) {
-      removePublicHoliday(date);
-      setDeleteConfirm(null);
+  // Batch operation handlers
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedHolidays(new Set(publicHolidays.map((h) => h.date)));
     } else {
-      setDeleteConfirm(date);
-      // Auto-clear confirmation after 3 seconds
-      setTimeout(() => setDeleteConfirm(null), 3000);
+      setSelectedHolidays(new Set());
     }
   };
+
+  const handleSelectHoliday = (date: string, checked: boolean) => {
+    const newSelected = new Set(selectedHolidays);
+    if (checked) {
+      newSelected.add(date);
+    } else {
+      newSelected.delete(date);
+    }
+    setSelectedHolidays(newSelected);
+  };
+
+  const handleBatchDelete = () => {
+    removeMultiplePublicHolidays(Array.from(selectedHolidays));
+    setSelectedHolidays(new Set());
+  };
+
+  const isAllSelected =
+    publicHolidays.length > 0 &&
+    selectedHolidays.size === publicHolidays.length;
+  const isSomeSelected = selectedHolidays.size > 0;
 
   return (
     <Collapsible
@@ -226,52 +257,129 @@ export function PublicHolidayManager() {
                     </p>
                   </div>
                 ) : (
-                  <div className="divide-y">
-                    {publicHolidays.map((holiday, index) => (
-                      <div
-                        key={`${holiday.date}-${index}`}
-                        className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <div className="flex-shrink-0">
-                            <div className="w-2 h-2 bg-primary rounded-full"></div>
-                          </div>
-                          <div>
-                            <h5 className="text-sm font-medium">
-                              {holiday.name}
-                            </h5>
-                            <p className="text-xs text-muted-foreground">
-                              {formatDate(holiday.date)}
-                            </p>
-                          </div>
-                        </div>
-
-                        <Button
-                          onClick={() => handleRemoveHoliday(holiday.date)}
-                          variant={
-                            deleteConfirm === holiday.date
-                              ? "destructive"
-                              : "ghost"
-                          }
-                          size="sm"
-                          className={
-                            deleteConfirm === holiday.date
-                              ? "h-8"
-                              : "h-8 w-8 p-0"
-                          }
+                  <>
+                    {/* Batch operations */}
+                    <div className="flex items-center justify-between p-4 bg-muted border-b">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="select-all-holidays"
+                          checked={isAllSelected}
+                          onCheckedChange={handleSelectAll}
+                        />
+                        <Label
+                          htmlFor="select-all-holidays"
+                          className="text-sm"
                         >
-                          {deleteConfirm === holiday.date ? (
-                            <>
-                              <CheckCircle className="w-3 h-3 mr-1" />
-                              Confirm
-                            </>
-                          ) : (
-                            <Trash2 className="w-3 h-3" />
-                          )}
-                        </Button>
+                          Select all ({publicHolidays.length})
+                        </Label>
                       </div>
-                    ))}
-                  </div>
+                      {isSomeSelected && (
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="destructive" size="sm">
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Delete Selected ({selectedHolidays.size})
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>
+                                Delete Selected Holidays
+                              </AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to delete{" "}
+                                {selectedHolidays.size} selected holiday(s)?
+                                This action cannot be undone.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction onClick={handleBatchDelete}>
+                                Delete
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      )}
+                    </div>
+
+                    <div className="divide-y">
+                      {publicHolidays.map((holiday, index) => (
+                        <div
+                          key={`${holiday.date}-${index}`}
+                          className="flex items-center justify-between p-4 hover:bg-muted/50 transition-colors"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <Checkbox
+                              id={`holiday-${index}`}
+                              checked={selectedHolidays.has(holiday.date)}
+                              onCheckedChange={(checked) =>
+                                handleSelectHoliday(
+                                  holiday.date,
+                                  checked as boolean
+                                )
+                              }
+                            />
+                            <div className="flex-shrink-0">
+                              <div className="w-2 h-2 bg-primary rounded-full"></div>
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <h5 className="text-sm font-medium">
+                                  {holiday.name}
+                                </h5>
+                                {holiday.isManual && (
+                                  <Badge
+                                    variant="secondary"
+                                    className="text-xs"
+                                  >
+                                    Manual
+                                  </Badge>
+                                )}
+                              </div>
+                              <p className="text-xs text-muted-foreground">
+                                {formatDate(holiday.date)}
+                              </p>
+                            </div>
+                          </div>
+
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>
+                                  Delete Holiday
+                                </AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Are you sure you want to delete "
+                                  {holiday.name}" ({formatDate(holiday.date)})?
+                                  This action cannot be undone.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() =>
+                                    removePublicHoliday(holiday.date)
+                                  }
+                                >
+                                  Delete
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      ))}
+                    </div>
+                  </>
                 )}
               </CardContent>
             </Card>
