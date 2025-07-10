@@ -5,6 +5,14 @@ All notable changes to the Advanced Leave Calculator project will be documented 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.5] - Real-time Updates Enhancement
+
+- **Fixed** real-time updates not working properly for new holiday additions
+- **Enhanced** Supabase subscription handlers with specific event type handling
+- **Improved** real-time sync for both public and not public holidays
+- **Added** granular event logging for better debugging and monitoring
+- **Enhanced** subscription channel configuration for immediate updates
+
 ## [2.0.4] - Enhanced Offline Support and Sync Management
 
 - **Enhanced** holiday management with proper offline-first functionality
