@@ -77,6 +77,22 @@ export default defineConfig({
             purpose: "maskable",
           },
         ],
+        screenshots: [
+          {
+            src: "screenshot-desktop.png",
+            sizes: "3338x1844",
+            type: "image/png",
+            form_factor: "wide",
+            label: "Leave Calculator Desktop View",
+          },
+          {
+            src: "screenshot-mobile.png",
+            sizes: "1284x2778",
+            type: "image/png",
+            form_factor: "narrow",
+            label: "Leave Calculator Mobile View",
+          },
+        ],
       },
     }),
   ],
