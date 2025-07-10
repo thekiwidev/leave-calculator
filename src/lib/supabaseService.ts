@@ -426,7 +426,10 @@ export const subscribeToNotPublicHolidayChanges = (
         fetchNotPublicHolidaysFromSupabase()
           .then(callback)
           .catch((error) => {
-            console.error("Error refetching not public holidays after insert:", error);
+            console.error(
+              "Error refetching not public holidays after insert:",
+              error
+            );
           });
       }
     )
@@ -443,7 +446,10 @@ export const subscribeToNotPublicHolidayChanges = (
         fetchNotPublicHolidaysFromSupabase()
           .then(callback)
           .catch((error) => {
-            console.error("Error refetching not public holidays after delete:", error);
+            console.error(
+              "Error refetching not public holidays after delete:",
+              error
+            );
           });
       }
     )
@@ -459,7 +465,10 @@ export const subscribeToNotPublicHolidayChanges = (
         fetchNotPublicHolidaysFromSupabase()
           .then(callback)
           .catch((error) => {
-            console.error("Error refetching not public holidays after update:", error);
+            console.error(
+              "Error refetching not public holidays after update:",
+              error
+            );
           });
       }
     )
