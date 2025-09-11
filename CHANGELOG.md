@@ -5,6 +5,17 @@ All notable changes to the Advanced Leave Calculator project will be documented 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.1] - Keep-Alive System Fixes and Improvements
+
+- **Fixed** keep-alive script database table dependency issues
+- **Added** robust fallback query system with multiple database table support
+- **Enhanced** keep-alive functionality to work with existing `not_public_holidays` table
+- **Improved** error handling with type-safe error management
+- **Added** comprehensive logging for keep-alive operations
+- **Fixed** TypeScript linting issues in keep-alive utility
+- **Enhanced** keep-alive script to handle various Supabase database configurations
+- **Added** multiple query strategies for maximum compatibility
+
 ## [2.1.0] - Supabase Keep-Alive System Implementation
 
 - **Added** comprehensive Supabase keep-alive system to prevent free-tier database auto-pause
@@ -18,6 +29,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Added** standalone keep-alive script for CI/CD integration
 - **Enhanced** documentation with complete keep-alive setup and usage instructions
 - **Added** GitHub repository secrets configuration guide for automated pings
+- **Fixed** keep-alive script to work with multiple database table configurations
+- **Added** fallback query system that tries multiple approaches to ensure database connectivity
+- **Enhanced** error handling with type-safe error management and detailed logging
 
 ## [2.0.5] - Real-time Updates Enhancement
 
