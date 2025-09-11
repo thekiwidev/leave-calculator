@@ -1,0 +1,49 @@
+# GitHub Actions workflow to keep Supabase database active
+# This workflow prevents the free-tier database from auto-pausing due to inactivity
+
+name: Keep Supabase Alive
+
+# Schedule the workflow to run daily at 8:00 UTC (well before 7-day timeout)
+on:
+  schedule:
+    # Runs at 8:00 UTC every day
+    - cron: "0 8 * * *"
+
+  # Allow manual triggering of the workflow
+  workflow_dispatch:
+
+jobs:
+  keep-alive:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository to access the keep-alive script
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Setup Node.js environment
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      # Setup Bun (the project uses Bun as package manager)
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      # Install dependencies
+      - name: Install Dependencies
+        run: bun install
+
+      # Run the keep-alive script
+      - name: Ping Supabase Database
+        run: bun run keep-alive
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.VITE_SUPABASE_SERVICE_ROLE_KEY }}
+
+      # Optional: Report status
+      - name: Report Status
+        run: echo "Supabase keep-alive ping completed successfully"

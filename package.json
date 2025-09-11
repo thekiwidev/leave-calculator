@@ -1,7 +1,7 @@
 {
   "name": "advanced-leave-calculator",
   "private": true,
-  "version": "2.0.4",
+  "version": "2.1.0",
   "type": "module",
   "description": "Advanced Leave Calculator - Calculate employee leave with working days and public holidays",
   "keywords": [
@@ -17,7 +17,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "keep-alive": "bun run scripts/keep-alive.ts"
   },
   "dependencies": {
     "@radix-ui/react-alert-dialog": "^1.1.14",
