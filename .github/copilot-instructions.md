@@ -2,9 +2,20 @@
 
 ## Operator Interaction
 
-- When asked to fix code, first explain the problems found.
-- When asked to generate tests, first explain what tests will be created.
-- When making multiple changes, provide a step-by-step overview first.
+- When asked to fix code, give 1–3 bullets of findings (≤1 sentence each), then show the patch.
+- When asked to generate tests, list 1–5 test intents (≤1 sentence each), then provide the tests.
+- When making multiple changes, give a terse checklist first, then the changes in order.
+- When asked to add features, list 1–5 feature bullets (≤1 sentence each), then provide the implementation.
+
+## Response Style (Default)
+
+- Be direct. Use simple terms.
+- Keep answers short: ≤5 sentences or ≤10 lines of code unless asked for more.
+- No preambles, no theory, no repetition.
+- Prefer bullet points over paragraphs.
+- Show the minimal working change first. Extra context only on request.
+- Do not ask clarifying questions unless execution would be unsafe or ambiguous.
+- If more detail is wanted, the operator will ask.
 
 ## Environment Variables
 
