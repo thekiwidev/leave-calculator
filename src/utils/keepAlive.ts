@@ -26,26 +26,87 @@ export const pingSupabaseKeepAlive = async (): Promise<{
   try {
     const supabase = createServerClient();
 
-    // Run a minimal query - just select 1 to check if database is responsive
-    const { error } = await supabase
-      .from("holidays") // Using existing table to avoid creating new ones
-      .select("id")
-      .limit(1);
+    // Try multiple fallback queries to ensure at least one works
+    let lastError: Error | { message: string } | null = null;
 
-    if (error) {
-      console.warn("Keep-alive query failed:", error);
-      return {
-        success: false,
-        message: `Database query failed: ${error.message}`,
-        timestamp: new Date().toISOString(),
-      };
+    // Option 1: Try to query existing tables if they exist
+    try {
+      const { error } = await supabase.from("holidays").select("id").limit(1);
+      if (!error) {
+        console.log("✅ Keep-alive successful using holidays table");
+        return {
+          success: true,
+          message: "Database keep-alive ping successful (holidays table)",
+          timestamp: new Date().toISOString(),
+        };
+      }
+      lastError = error || { message: "Unknown error" };
+    } catch (err) {
+      lastError = err instanceof Error ? err : { message: String(err) };
     }
 
-    // @comment: Successfully pinged database
-    console.log("Supabase keep-alive ping successful");
+    // Option 2: Try not_public_holidays table
+    try {
+      const { error } = await supabase
+        .from("not_public_holidays")
+        .select("id")
+        .limit(1);
+      if (!error) {
+        console.log("✅ Keep-alive successful using not_public_holidays table");
+        return {
+          success: true,
+          message:
+            "Database keep-alive ping successful (not_public_holidays table)",
+          timestamp: new Date().toISOString(),
+        };
+      }
+      lastError = error || { message: "Unknown error" };
+    } catch (err) {
+      lastError = err instanceof Error ? err : { message: String(err) };
+    }
+
+    // Option 3: Use raw SQL query that should work in any PostgreSQL instance
+    try {
+      const { error } = await supabase.rpc("version");
+      if (!error) {
+        console.log("✅ Keep-alive successful using version() function");
+        return {
+          success: true,
+          message: "Database keep-alive ping successful (version function)",
+          timestamp: new Date().toISOString(),
+        };
+      }
+      lastError = error || { message: "Unknown error" };
+    } catch (err) {
+      lastError = err instanceof Error ? err : { message: String(err) };
+    }
+
+    // Option 4: Last resort - try a simple SELECT 1 query
+    try {
+      const { error } = await supabase
+        .from("_supabase_tables") // This is a system table that should exist
+        .select("*")
+        .limit(1);
+      if (!error) {
+        console.log("✅ Keep-alive successful using system table");
+        return {
+          success: true,
+          message: "Database keep-alive ping successful (system table)",
+          timestamp: new Date().toISOString(),
+        };
+      }
+      lastError = error || { message: "Unknown error" };
+    } catch (err) {
+      lastError = err instanceof Error ? err : { message: String(err) };
+    }
+
+    // If all options failed, return the last error
+    console.error("All keep-alive query options failed");
     return {
-      success: true,
-      message: "Database keep-alive ping successful",
+      success: false,
+      message: `All database queries failed. Last error: ${
+        lastError?.message || "Unknown error"
+      }`,
       timestamp: new Date().toISOString(),
     };
   } catch (error) {
