@@ -20,6 +20,9 @@ jobs:
       # Checkout the repository to access the keep-alive script
       - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          ref: 'v-ii'  # Explicitly checkout the v-ii branch
+          fetch-depth: 0  # Fetch all history to ensure latest code
 
       # Setup Node.js environment
       - name: Setup Node.js
@@ -36,6 +39,10 @@ jobs:
       # Install dependencies
       - name: Install Dependencies
         run: bun install
+
+      # Ensure we're using the latest code
+      - name: Verify Code Version
+        run: echo "Running keep-alive from $(git rev-parse HEAD) on branch $(git branch --show-current)"
 
       # Run the keep-alive script
       - name: Ping Supabase Database
