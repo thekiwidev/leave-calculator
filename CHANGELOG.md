@@ -5,6 +5,20 @@ All notable changes to the Advanced Leave Calculator project will be documented 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - Supabase Keep-Alive System Implementation
+
+- **Added** comprehensive Supabase keep-alive system to prevent free-tier database auto-pause
+- **Added** automatic background scheduling with 6-day ping intervals (144 hours)
+- **Added** GitHub Actions workflow for daily external keep-alive pings
+- **Added** manual keep-alive testing functionality via `bun run keep-alive` command
+- **Added** KeepAliveTest component for admin interface testing of keep-alive functionality
+- **Added** service role key environment variable for server-side database operations
+- **Enhanced** main.tsx with automatic keep-alive scheduler initialization
+- **Added** comprehensive error handling and logging for keep-alive operations
+- **Added** standalone keep-alive script for CI/CD integration
+- **Enhanced** documentation with complete keep-alive setup and usage instructions
+- **Added** GitHub repository secrets configuration guide for automated pings
+
 ## [2.0.5] - Real-time Updates Enhancement
 
 - **Fixed** real-time updates not working properly for new holiday additions

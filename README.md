@@ -62,13 +62,25 @@ A modern, responsive web application for calculating employee leave with accurat
    cp .env.example .env
    ```
 
-   Add your API Ninjas key to `.env` for public holiday API access:
+   Configure your environment variables in `.env`:
 
    ```env
+   # API Ninjas key for fetching public holidays
    VITE_API_NINJAS_KEY=your_api_key_here
+
+   # Supabase configuration
+   VITE_SUPABASE_URL="https://your-project-ref.supabase.co"
+   VITE_SUPABASE_ANON_KEY="your-anon-key"
+   VITE_SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
+
+   # Admin access
+   VITE_ADMIN_SECRET_KEY="your-super-secret-password"
    ```
 
-   **Note**: For production deployment, implement server-side API key handling for security.
+   **Important**:
+
+   - For production deployment, implement server-side API key handling for security
+   - The `VITE_SUPABASE_SERVICE_ROLE_KEY` is used for keep-alive functionality to prevent database auto-pause
 
 4. **Start Development Server**
 
@@ -157,12 +169,43 @@ src/
 
 ## API Integration
 
+### Public Holidays API
+
 The application integrates with [API Ninjas Public Holidays API](https://api.api-ninjas.com/) to fetch Nigerian public holidays. The integration includes:
 
 - Automatic retry on failure
 - Fallback to local storage data
 - Graceful error handling
 - Secure API key management (environment variables)
+
+### Supabase Database & Keep-Alive
+
+The application uses Supabase for persistent data storage and includes an automated keep-alive system to prevent free-tier database auto-pause:
+
+#### Keep-Alive Features
+
+- **Automatic Scheduling**: Pings database every 6 days to prevent 7-day timeout
+- **GitHub Actions**: Daily automated pings via CI/CD workflow
+- **Manual Testing**: Admin interface for testing keep-alive functionality
+- **Error Handling**: Comprehensive logging and error reporting
+
+#### Setup Keep-Alive
+
+1. **Environment Variables**: Add your Supabase service role key to `.env`
+2. **GitHub Secrets**: Configure repository secrets for automated pings:
+   - `VITE_SUPABASE_URL`: Your Supabase project URL
+   - `VITE_SUPABASE_SERVICE_ROLE_KEY`: Service role key from Supabase settings
+3. **Manual Testing**: Run `bun run keep-alive` to test the functionality
+
+#### Keep-Alive Commands
+
+```bash
+# Test keep-alive functionality
+bun run keep-alive
+
+# Check keep-alive status (in development)
+# The app automatically starts keep-alive scheduler when running
+```
 
 ## Browser Support
 
